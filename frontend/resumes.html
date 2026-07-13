@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CVForge — Мої резюме</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="static/css/styles.css">
+</head>
+<body>
+
+<div class="bg-grid" aria-hidden="true"></div>
+
+<!-- ============ AUTH MODAL ============ -->
+<div id="authModal" class="modal-overlay">
+  <div class="modal window-chrome">
+    <div class="window-titlebar">
+      <div class="window-dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+      <div class="window-tab">auth.login</div>
+    </div>
+    <div class="modal-body">
+      <p class="eyebrow">// потрібна автентифікація</p>
+      <h2 class="modal-title">Вхід у CVForge</h2>
+      <p class="modal-sub">Отримайте JWT-токен, щоб побачити свої резюме</p>
+
+      <form id="loginForm" novalidate>
+        <div class="field">
+          <label for="username">Ім'я користувача</label>
+          <input type="text" id="username" class="input" required placeholder="Ваш username в Django" autocomplete="username">
+        </div>
+        <div class="field">
+          <label for="password">Пароль</label>
+          <input type="password" id="password" class="input" required placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <p id="loginError" class="form-error hidden"></p>
+        <button type="submit" class="btn btn-accent btn-block">Увійти та почати</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============ TEMPLATE EXPORT MODAL ============ -->
+<div id="templateModal" class="modal-overlay hidden">
+  <div class="modal window-chrome">
+    <div class="window-titlebar">
+      <div class="window-dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+      <div class="window-tab">export.template</div>
+    </div>
+    <div class="modal-body">
+      <p class="eyebrow">// оберіть шаблон</p>
+      <h2 class="modal-title">Шаблон для експорту</h2>
+      <p class="modal-sub">PDF буде згенеровано за обраним дизайном</p>
+
+      <div id="templateList" class="template-list"></div>
+
+      <button type="button" id="templateModalCancel" class="btn btn-ghost btn-block" style="margin-top:1rem;">
+        Скасувати
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div class="app-shell">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">◆</span>
+      <span class="brand-path">~/cvforge</span>
+    </div>
+    <div class="topbar-actions">
+      <a href="/" id="newResumeBtn" class="btn btn-outline btn-sm">+ Нове резюме</a>
+      <button id="logoutBtn" class="btn btn-ghost btn-sm">Вийти з акаунту</button>
+    </div>
+  </header>
+
+  <div class="editor-window">
+    <div class="window-titlebar">
+      <div class="window-dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+      <div class="window-tab">~/resumes/</div>
+    </div>
+
+    <div class="directory-body">
+      <div class="page-head">
+        <div>
+          <p class="eyebrow" id="listEyebrow">resumes/ · завантаження...</p>
+          <h2 class="step-title">Мої резюме</h2>
+        </div>
+        <button type="button" id="refreshBtn" class="btn btn-outline btn-sm">↻ Оновити</button>
+      </div>
+
+      <div id="resumeList" class="resume-list"></div>
+
+      <p id="loadingState" class="empty-state">Завантаження списку резюме...</p>
+      <div id="emptyState" class="empty-state hidden">
+        Резюме ще не створено.
+        <br><br>
+        <a href="/" class="btn btn-accent btn-sm">+ Створити перше резюме</a>
+      </div>
+    </div>
+  </div>
+
+  <p class="foot-note">CVForge · GET /api/resumes/</p>
+</div>
+
+<div id="toastHost" class="toast-host" aria-live="polite"></div>
+
+<script src="static/js/resume.js"></script>
+</body>
+</html>

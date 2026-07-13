@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            color: #2d3748;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        
+        /* Хедер резюме */
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #1a365d;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        h1 { 
+            margin: 0 0 5px 0; 
+            color: #1a365d; 
+            font-size: 28px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .summary { 
+            font-style: italic; 
+            margin: 10px auto 15px auto; 
+            color: #4a5568; 
+            max-width: 90%;
+            font-size: 14px;
+        }
+
+        /* Горизонтальна панель контактів та іконок */
+        .contacts-table {
+            width: 100%;
+            margin-top: 10px;
+        }
+        .contacts-td {
+            text-align: center;
+            vertical-align: middle;
+            color: #4a5568;
+            font-size: 13px;
+        }
+        .social-icon {
+            display: inline-block;
+            vertical-align: middle;
+            margin: 0 6px;
+        }
+        .social-icon img {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Секції */
+        .section-title {
+            text-transform: uppercase;
+            border-bottom: 2px solid #2b6cb0;
+            padding-bottom: 3px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            color: #2b6cb0;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Елементи списків */
+        .item { 
+            margin-bottom: 15px; 
+            page-break-inside: avoid;
+        }
+        .item-header {
+            width: 100%;
+            margin-bottom: 3px;
+        }
+        .item-title { 
+            font-weight: bold; 
+            color: #2d3748;
+            font-size: 15px;
+        }
+        .item-subtitle {
+            color: #4a5568;
+            font-style: italic;
+        }
+        .date { 
+            color: #718096; 
+            font-size: 12px; 
+            text-align: right;
+            vertical-align: top;
+        }
+        p { margin: 5px 0 0 0; color: #4a5568; }
+
+        /* Компактні списки для Мов та Сертифікатів */
+        .compact-table {
+            width: 100%;
+        }
+        .compact-td {
+            width: 50%;
+            vertical-align: top;
+            padding-bottom: 8px;
+        }
+        .badge {
+            background-color: #ebf8ff;
+            color: #2b6cb0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>{{ resume.title }}</h1>
+        {% if resume.summary %}
+            <p class="summary">{{ resume.summary }}</p>
+        {% endif %}
+
+        <table class="contacts-table">
+            <tr>
+                <td class="contacts-td">
+                    {% for link in resume.links.all %}
+                        <a href="{{ link.url }}" class="social-icon" target="_blank" title="{{ link.get_platform_display }}">
+                            {% if link.platform == 'linkedin' %}
+                                <img src="https://img.icons8.com/ios-filled/50/2b6cb0/linkedin.png" alt="LinkedIn">
+                            {% elif link.platform == 'github' %}
+                                <img src="https://img.icons8.com/ios-filled/50/2b6cb0/github.png" alt="GitHub">
+                            {% elif link.platform == 'gitlab' %}
+                                <img src="https://img.icons8.com/ios-filled/50/2b6cb0/gitlab.png" alt="GitLab">
+                            {% elif link.platform == 'telegram' %}
+                                <img src="https://img.icons8.com/ios-filled/50/2b6cb0/telegram-app.png" alt="Telegram">
+                            {% else %}
+                                <img src="https://img.icons8.com/ios-filled/50/2b6cb0/link.png" alt="Link">
+                            {% endif %}
+                        </a>
+                    {% endfor %}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <h2 class="section-title">Досвід роботи</h2>
+    {% for exp in resume.experience.all %}
+    <div class="item">
+        <table class="item-header">
+            <tr>
+                <td class="item-title">{{ exp.position }} <span class="item-subtitle">— {{ exp.company_name }}</span></td>
+                <td class="date">{{ exp.start_date }} — {% if exp.is_current %}Теперішній час{% else %}{{ exp.end_date }}{% endif %}</td>
+            </tr>
+        </table>
+        <p>{{ exp.description }}</p>
+    </div>
+    {% empty %}
+    <p>Досвід роботи відсутній.</p>
+    {% endfor %}
+
+    <h2 class="section-title">Проєкти (Pet Projects)</h2>
+    {% for project in resume.projects.all %}
+    <div class="item">
+        <table class="item-header">
+            <tr>
+                <td class="item-title">
+                    {{ project.title }}
+                    {% if project.link %}
+                        <span style="font-size: 12px; font-weight: normal; margin-left: 10px;">
+                            <a href="{{ project.link }}" target="_blank" style="color: #2b6cb0; text-decoration: none;">🔗 Посилання</a>
+                        </span>
+                    {% endif %}
+                </td>
+                <td class="date"><span class="badge">{{ project.technologies }}</span></td>
+            </tr>
+        </table>
+        <p>{{ project.description }}</p>
+    </div>
+    {% empty %}
+    <p>Проєкти відсутні.</p>
+    {% endfor %}
+
+    <h2 class="section-title">Освіта</h2>
+    {% for edu in resume.education.all %}
+    <div class="item">
+        <table class="item-header">
+            <tr>
+                <td class="item-title">{{ edu.degree }} <span class="item-subtitle">({{ edu.field_of_study }})</span></td>
+                <td class="date">Рік випуску: {{ edu.graduation_year }}</td>
+            </tr>
+        </table>
+        <p>{{ edu.institution }}</p>
+    </div>
+    {% empty %}
+    <p>Інформація про освіту відсутня.</p>
+    {% endfor %}
+
+    <table class="compact-table">
+        <tr>
+            <td class="compact-td" style="width: 45%; padding-right: 5%;">
+                <h2 class="section-title" style="margin-top: 10px;">Знання мов</h2>
+                {% for lang in resume.languages.all %}
+                    <div style="margin-bottom: 6px;">
+                        <span style="font-weight: bold;">{{ lang.name }}</span> 
+                        <span class="badge">{{ lang.get_level_display }}</span>
+                    </div>
+                {% empty %}
+                    <p>Не вказано.</p>
+                {% endfor %}
+            </td>
+
+            <td class="compact-td" style="width: 50%;">
+                <h2 class="section-title" style="margin-top: 10px;">Сертифікати</h2>
+                {% for cert in resume.certifications.all %}
+                    <div style="margin-bottom: 8px; page-break-inside: avoid;">
+                        <span style="font-weight: bold;">{{ cert.name }}</span> — <span class="item-subtitle">{{ cert.issuing_organization }}</span>
+                        {% if cert.issue_date %}<div class="date" style="text-align: left; display:block;">{{ cert.issue_date }} - {{ cert.url }}</div>{% endif %}
+                    </div>
+                {% empty %}
+                    <p>Сертифікати відсутні.</p>
+                {% endfor %}
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

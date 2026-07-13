@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CVForge — Конструктор резюме</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="static/css/styles.css">
+</head>
+<body>
+
+<div class="bg-grid" aria-hidden="true"></div>
+
+<!-- ============ AUTH MODAL ============ -->
+<div id="authModal" class="modal-overlay">
+  <div class="modal window-chrome">
+    <div class="window-titlebar">
+      <div class="window-dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+      <div class="window-tab">auth.login</div>
+    </div>
+    <div class="modal-body">
+      <p class="eyebrow">// потрібна автентифікація</p>
+      <h2 class="modal-title">Вхід у CVForge</h2>
+      <p class="modal-sub">Отримайте JWT-токен, щоб почати збирати резюме</p>
+
+      <form id="loginForm" novalidate>
+        <div class="field">
+          <label for="username">Ім'я користувача</label>
+          <input type="text" id="username" class="input" required placeholder="Ваш username в Django" autocomplete="username">
+        </div>
+        <div class="field">
+          <label for="password">Пароль</label>
+          <input type="password" id="password" class="input" required placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <p id="loginError" class="form-error hidden"></p>
+        <button type="submit" class="btn btn-accent btn-block">Увійти та почати</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- ============ CROP MODAL ============ -->
+<div id="cropModal" class="modal-overlay hidden">
+  <div class="modal crop-modal window-chrome">
+    <div class="window-titlebar">
+      <div class="window-dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+      <div class="window-tab">crop_photo.png</div>
+    </div>
+    <div class="modal-body crop-modal-body">
+      <p class="eyebrow">// кадрування фото</p>
+      <h2 class="modal-title">Обрізати фото</h2>
+      <p class="modal-sub">Перетягніть фото, щоб обрати ділянку, і масштабуйте повзунком.</p>
+
+      <div class="crop-stage" id="cropStage">
+        <canvas id="cropCanvas"></canvas>
+      </div>
+
+      <div class="crop-controls">
+        <span class="crop-zoom-label">🔍</span>
+        <input type="range" id="cropZoom" min="1" max="3" step="0.01" value="1">
+      </div>
+
+      <div class="crop-actions">
+        <button type="button" class="btn btn-ghost" id="cropCancelBtn">Скасувати</button>
+        <button type="button" class="btn btn-accent" id="cropConfirmBtn">Застосувати</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div class="app-shell">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">◆</span>
+      <span class="brand-path">~/cvforge</span>
+    </div>
+    <div class="topbar-actions">
+      <a href="resumes" class="btn btn-outline btn-sm">📂 Мої резюме</a>
+      <button id="logoutBtn" class="btn btn-ghost btn-sm">Вийти з акаунту</button>
+    </div>
+  </header>
+
+  <div class="editor-window">
+    <div class="window-titlebar">
+      <div class="window-dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+      <div class="window-tab" id="activeTab">01_basics.json</div>
+    </div>
+
+    <div class="editor-body">
+
+      <!-- ===== PIPELINE / STEPPER ===== -->
+      <aside class="pipeline" aria-label="Кроки заповнення резюме">
+        <div class="pipeline-rail"><div class="pipeline-rail-fill" id="railFill"></div></div>
+        <ol class="pipeline-list" id="pipelineList"></ol>
+      </aside>
+
+      <!-- ===== MAIN PANEL ===== -->
+      <main class="panel">
+        <div class="panel-scroll">
+          <div id="resumeForm">
+
+            <!-- STEP 1 — BASICS -->
+            <section class="step-panel active" data-step="1">
+              <p class="eyebrow" data-eyebrow>01 / 10 · profile.json</p>
+              <h2 class="step-title">Основна інформація</h2>
+              <p class="step-hint">Хто ви і на яку роль претендуєте.</p>
+
+              <div class="field">
+                <label for="title">Бажана посада</label>
+                <input type="text" id="title" class="input" placeholder="Напр. Python Backend Developer" required>
+              </div>
+              <div class="field">
+                <label for="summary">Про себе (Summary)</label>
+                <textarea id="summary" rows="4" class="input" placeholder="Короткий опис ваших ключових навичок та досягнень..."></textarea>
+              </div>
+            </section>
+
+            <!-- STEP 2 — PERSONAL INFO -->
+            <section class="step-panel " data-step="2" id = "personalInfoContainer">
+              <p class="eyebrow" data-eyebrow>02 / 10 · profile.json</p>
+              <h2 class="step-title">Персональні дані</h2>
+              <p class="step-hint">Давайте познайомимось поближче.</p>
+
+              <div class="field">
+                <div class="grid-2">
+                    <div class="field" style="margin-bottom:0">
+                        <label for="firstName">Ім'я</label>
+                        <input type="text" id="firstName" class="input" required>
+                    </div>
+                    <div class="field" style="margin-bottom:0">
+                        <label for="lastName">Прізвище</label>
+                        <input type="text" id="lastName" class="input" required>
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="field">
+                        <label for="email">Електронна пошта</label>
+                        <input type="email" id="email" class="input" placeholder="you@example.com" required>
+                    </div>
+                    <div class="field">
+                        <label for="phoneNumber">Номер телефону</label>
+                        <input type="tel" id="phoneNumber" class="input">
+                    </div>
+                </div>
+
+                <div class="field">
+                  <label>Фото профілю</label>
+                  <div class="photo-upload">
+                    <div class="photo-preview" id="photoPreview">
+                      <span class="photo-placeholder" id="photoPlaceholder">👤</span>
+                      <img id="photoPreviewImg" class="hidden" alt="Фото профілю">
+                    </div>
+                    <div class="photo-upload-actions">
+                      <button type="button" class="btn btn-outline btn-sm" id="photoChooseBtn">📷 Обрати фото</button>
+                      <button type="button" class="btn-remove hidden" id="photoRemoveBtn">Видалити фото</button>
+                      <input type="file" id="userPhoto" accept="image/*" class="hidden">
+                      <p class="field-hint">JPG або PNG. Після вибору можна буде обрізати кадр.</p>
+                    </div>
+                  </div>
+                </div>
+            </section>
+
+            <!-- STEP 3 — LINKS -->
+            <section class="step-panel" data-step="3">
+              <p class="eyebrow" data-eyebrow>03 / 10 · links.json</p>
+              <div class="step-head-row">
+                <div>
+                  <h2 class="step-title">Посилання</h2>
+                  <p class="step-hint">Соцмережі, GitHub, портфоліо. Необов'язково.</p>
+                </div>
+                <button type="button" onclick="addLink()" class="btn btn-outline btn-sm">+ Додати посилання</button>
+              </div>
+              <div id="linksContainer" class="entry-list"></div>
+              <p class="empty-state" id="linksEmpty">Ще не додано жодного посилання — натисніть «Додати посилання».</p>
+            </section>
+
+            <!-- STEP 4 — EXPERIENCE -->
+            <section class="step-panel" data-step="4">
+              <p class="eyebrow" data-eyebrow>04 / 10 · experience.json</p>
+              <div class="step-head-row">
+                <div>
+                  <h2 class="step-title">Досвід роботи</h2>
+                  <p class="step-hint">Найважливіший розділ для рекрутера.</p>
+                </div>
+                <button type="button" onclick="addExperience()" class="btn btn-outline btn-sm">+ Додати досвід</button>
+              </div>
+              <div id="experienceContainer" class="entry-list"></div>
+              <p class="empty-state" id="experienceEmpty">Ще не додано досвіду роботи.</p>
+            </section>
+
+            <!-- STEP 5 — PROJECTS -->
+            <section class="step-panel" data-step="5">
+              <p class="eyebrow" data-eyebrow>05 / 10 · projects.json</p>
+              <div class="step-head-row">
+                <div>
+                  <h2 class="step-title">Проєкти (Pet Projects)</h2>
+                  <p class="step-hint">Покажіть, що вмієте робити на практиці.</p>
+                </div>
+                <button type="button" onclick="addProject()" class="btn btn-outline btn-sm">+ Додати проєкт</button>
+              </div>
+              <div id="projectsContainer" class="entry-list"></div>
+              <p class="empty-state" id="projectsEmpty">Ще не додано жодного проєкту.</p>
+            </section>
+
+            <!-- STEP 6 — EDUCATION -->
+            <section class="step-panel" data-step="6">
+              <p class="eyebrow" data-eyebrow>06 / 10 · education.json</p>
+              <div class="step-head-row">
+                <div>
+                  <h2 class="step-title">Освіта</h2>
+                  <p class="step-hint">Заклади освіти та здобута кваліфікація.</p>
+                </div>
+                <button type="button" onclick="addEducation()" class="btn btn-outline btn-sm">+ Додати освіту</button>
+              </div>
+              <div id="educationContainer" class="entry-list"></div>
+              <p class="empty-state" id="educationEmpty">Ще не додано записів про освіту.</p>
+            </section>
+
+            <!-- STEP 7 — LANGUAGES -->
+            <section class="step-panel" data-step="7">
+              <p class="eyebrow" data-eyebrow>07 / 10 · languages.json</p>
+              <div class="step-head-row">
+                <div>
+                  <h2 class="step-title">Мови</h2>
+                  <p class="step-hint">Рівень володіння за шкалою CEFR.</p>
+                </div>
+                <button type="button" onclick="addLanguage()" class="btn btn-outline btn-sm">+ Додати мову</button>
+              </div>
+              <div id="languagesContainer" class="entry-list"></div>
+              <p class="empty-state" id="languagesEmpty">Ще не додано жодної мови.</p>
+            </section>
+
+            <!-- STEP 8 — SKILLS -->
+            <section class="step-panel" data-step="8">
+              <p class="eyebrow" data-eyebrow>08 / 10 · skills.json</p>
+              <div class="step-head-row">
+                <div>
+                  <h2 class="step-title">Навички</h2>
+                </div>
+                <button type="button" onclick="addSkill()" class="btn btn-outline btn-sm">+ Додати навичку</button>
+              </div>
+              <div id="skillsContainer" class="entry-list"></div>
+              <p class="empty-state" id="skillsEmpty">Ще не додано жодної навички.</p>
+            </section>
+
+            <!-- STEP 9 — CERTIFICATIONS -->
+            <section class="step-panel" data-step="9">
+              <p class="eyebrow" data-eyebrow>09 / 10 · certifications.json</p>
+              <div class="step-head-row">
+                <div>
+                  <h2 class="step-title">Сертифікати</h2>
+                  <p class="step-hint">Курси, іспити, професійні відзнаки.</p>
+                </div>
+                <button type="button" onclick="addCertification()" class="btn btn-outline btn-sm">+ Додати сертифікат</button>
+              </div>
+              <div id="certificationsContainer" class="entry-list"></div>
+              <p class="empty-state" id="certificationsEmpty">Ще не додано сертифікатів.</p>
+            </section>
+
+            <!-- STEP 10 — REVIEW -->
+            <section class="step-panel" data-step="10">
+              <p class="eyebrow" data-eyebrow>10 / 10 · resume.json</p>
+              <h2 class="step-title">Перегляд і збереження</h2>
+              <p class="step-hint">Перевірте дані перед збереженням. Будь-який блок можна відредагувати.</p>
+              <div id="reviewContent" class="review-content"></div>
+            </section>
+
+          </div>
+        </div>
+
+        <footer class="panel-footer">
+          <button type="button" id="backBtn" class="btn btn-ghost">← Назад</button>
+          <div class="footer-right">
+            <span id="stepCounter" class="step-counter">Крок 1 з 8</span>
+            <button type="button" id="nextBtn" class="btn btn-accent">Далі →</button>
+            <button type="button" id="saveBtn" class="btn btn-accent hidden">Зберегти резюме</button>
+            <button type="button" id="exportBtn" class="btn btn-accent-2 hidden">📥 Експортувати в PDF</button>
+          </div>
+        </footer>
+      </main>
+
+    </div>
+  </div>
+
+  <p class="foot-note">CVForge · дані зберігаються лише після натискання «Зберегти резюме»</p>
+</div>
+
+<div id="toastHost" class="toast-host" aria-live="polite"></div>
+
+
+<div id="templateModal" class="modal-overlay hidden">
+  <div class="modal window-chrome">
+    <div class="window-titlebar">
+      <div class="window-dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+      <div class="window-tab">export.template</div>
+    </div>
+    <div class="modal-body">
+      <p class="eyebrow">// оберіть шаблон</p>
+      <h2 class="modal-title">Шаблон для експорту</h2>
+      <p class="modal-sub">PDF буде згенеровано за обраним дизайном</p>
+
+      <div id="templateList" class="template-list"></div>
+
+      <button type="button" id="templateModalCancel" class="btn btn-ghost btn-block" style="margin-top:1rem;">
+        Скасувати
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<script src="static/js/main.js"></script>
+</body>
+</html>

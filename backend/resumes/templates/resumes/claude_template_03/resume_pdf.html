@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV_{{ resume.personal_info.first_name }}_{{ resume.personal_info.last_name|default:"Resume" }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ css_path }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="sheet">
+
+        <!-- ===================== SIDEBAR ===================== -->
+        <aside class="rail">
+
+            <div class="rail-mark">FIG. 01</div>
+
+            {% if personal_info.photo %}
+            <div class="frame-photo">
+                <span class="corner corner-tl"></span><span class="corner corner-tr"></span>
+                <span class="corner corner-bl"></span><span class="corner corner-br"></span>
+                <img src="{{ personal_info.photo.url }}" alt="{{ personal_info.first_name }}">
+            </div>
+            {% endif %}
+
+            <h1 class="rail-name">{{ personal_info.first_name }}<br>{{ personal_info.last_name }}</h1>
+            <p class="rail-role">{{ resume.title }}</p>
+
+            <div class="rail-divider"></div>
+
+            <div class="rail-block">
+                <h2 class="rail-heading">Contact</h2>
+                <ul class="rail-list">
+                    {% if personal_info.email %}<li><i class="fa-solid fa-envelope"></i>{{ personal_info.email }}</li>{% endif %}
+                    {% if personal_info.phone_number %}<li><i class="fa-solid fa-phone"></i>{{ personal_info.phone_number }}</li>{% endif %}
+                    {% if personal_info.birth_date %}<li><i class="fa-solid fa-calendar-days"></i>{{ personal_info.birth_date }}</li>{% endif %}
+                    {% for link in links %}
+                    <li>
+                        {% if link.platform == "linkedin" %}<i class="fa-brands fa-linkedin"></i>
+                        {% elif link.platform == "github" %}<i class="fa-brands fa-github"></i>
+                        {% elif link.platform == "gitlab" %}<i class="fa-brands fa-gitlab"></i>
+                        {% elif link.platform == "telegram" %}<i class="fa-brands fa-telegram"></i>
+                        {% else %}<i class="fa-solid fa-link"></i>{% endif %}
+                        <a href="{{ link.url }}">{{ link.url|cut:"https://"|cut:"http://" }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            {% if skills %}
+            <div class="rail-divider"></div>
+            <div class="rail-block">
+                <h2 class="rail-heading">Skills</h2>
+                <div class="gauge-list">
+                    {% for skill in skills %}
+                    <div class="gauge">
+                        <div class="gauge-label">
+                            <span>{{ skill.name }}</span>
+                            <span class="gauge-index">{{ skill.level_as_number }}/5</span>
+                        </div>
+                        <div class="gauge-track">
+                            <div class="gauge-fill" style="width: {% widthratio skill.level_as_number 5 100 %}%;"></div>
+                            <div class="gauge-ticks"><span></span><span></span><span></span><span></span></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if languages %}
+            <div class="rail-divider"></div>
+            <div class="rail-block">
+                <h2 class="rail-heading">Languages</h2>
+                <ul class="rail-list rail-list-plain">
+                    {% for lang in languages %}
+                    <li><span class="lang-name">{{ lang.name }}</span><span class="lang-dot"></span>{{ lang.level }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+        </aside>
+
+        <!-- ===================== MAIN ===================== -->
+        <main class="drafting">
+
+            {% if resume.summary %}
+            <section class="section">
+                <h2 class="section-title"><span class="section-code">§00</span>Profile</h2>
+                <p class="summary-text">{{ resume.summary }}</p>
+            </section>
+            {% endif %}
+
+            {% if experience %}
+            <section class="section">
+                <h2 class="section-title"><span class="section-code">§01</span>Employment</h2>
+                <div class="scale">
+                    <div class="scale-rule"></div>
+                    {% for job in experience %}
+                    <div class="scale-item">
+                        <span class="scale-tick"></span>
+                        <div class="scale-date">{{ job.start_date|date:"M Y" }} &rarr; {{ job.end_date|date:"M Y"|default:"present" }}</div>
+                        <div class="scale-body">
+                            <div class="entry-row">
+                                <span class="entry-title">{{ job.title }}</span>
+                            </div>
+                            <div class="entry-subtitle">{{ job.company_name }}</div>
+                            {% if job.description %}<p class="entry-desc">{{ job.description }}</p>{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            {% if education %}
+            <section class="section">
+                <h2 class="section-title"><span class="section-code">§02</span>Education</h2>
+                <div class="scale">
+                    <div class="scale-rule"></div>
+                    {% for edu in education %}
+                    <div class="scale-item">
+                        <span class="scale-tick scale-tick-alt"></span>
+                        <div class="scale-date">{{ edu.start_year }} &rarr; {{ edu.graduation_year }}</div>
+                        <div class="scale-body">
+                            <div class="entry-row">
+                                <span class="entry-title">{{ edu.degree }} &mdash; {{ edu.field_of_study }}</span>
+                            </div>
+                            <div class="entry-subtitle">{{ edu.institution }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            {% if projects %}
+            <section class="section">
+                <h2 class="section-title"><span class="section-code">§03</span>Pet-projects</h2>
+                <div class="blueprint-grid">
+                    {% for project in projects %}
+                    <div class="bp-card">
+                        <div class="bp-card-index">{{ forloop.counter|stringformat:"02d" }}</div>
+                        <div class="entry-row">
+                            <span class="entry-title">{{ project.title }}</span>
+                        </div>
+                        {% if project.start_date %}
+                        <div class="scale-date scale-date-inline">{{ project.start_date }}{% if project.end_date %} &rarr; {{ project.end_date }}{% endif %}</div>
+                        {% endif %}
+                        {% if project.description %}<p class="entry-desc">{{ project.description }}</p>{% endif %}
+                        {% if project.link %}<a class="bp-link" href="{{ project.link }}">{{ project.link|cut:"https://"|cut:"http://" }}</a>{% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            {% if certifications %}
+            <section class="section">
+                <h2 class="section-title"><span class="section-code">§04</span>Certifications</h2>
+                <ul class="cert-list">
+                    {% for cert in certifications %}
+                    <li class="cert-item">
+                        <span class="cert-name">{{ cert.name }}</span>
+                        {% if cert.issuing_organization %}<span class="cert-issuer">{{ cert.issuing_organization }}</span>{% endif %}
+                        {% if cert.issue_date %}<span class="cert-date">{{ cert.issue_date }}</span>{% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </section>
+            {% endif %}
+
+        </main>
+
+    </div>
+
+</body>
+</html>

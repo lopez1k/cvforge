@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV_{{ resume.personal_info.first_name_resume.personal_info.last_name|default:"Resume" }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ css_path }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="resume-container">
+        <aside class="sidebar">
+            <div class="sidebar-top-wave">
+                <h1 class="name">{{ resume.title }}</h1>
+            </div>
+            
+            {% if personal_info.photo %}
+            <div class="profile-img-container">
+                <img src="{{ personal_info.photo.url }}" alt="{{ personal_info.first_name }}" class="profile-img">
+            </div>
+            {% endif %}
+
+            <div class="sidebar-content">
+                <section class="sidebar-section">
+                    <h2>Personal details</h2>
+                    <ul class="personal-info">
+                        <li><i class="fa-solid fa-user"></i> <span>{{ personal_info.first_name }} {{ personal_info.last_name }}</span></li>
+                        
+                        {% if personal_info.email %}
+                        <li><i class="fa-solid fa-envelope"></i> <span>{{ personal_info.email }}</span></li>
+                        {% endif %}
+
+                        {% if personal_info.phone_number %}
+                        <li><i class="fa-solid fa-phone"></i> <span>{{ personal_info.phone_number }}</span></li>
+                        {% endif %}
+
+                        {% if personal_info.birth_date %}
+                        <li><i class="fa-solid fa-calendar-days"></i> <span>{{ personal_info.birth_date }}</span></li>
+                        {% endif %}
+
+                        {% if links %}
+                            {% for link in links%}
+                                    <li><i class="fa-brands fa-{{ link.platform }}"></i> <span class="break-word"><a href="{{ link.url }}">{{ link.url|cut:"https://" }}.</a></span></li>
+                            {% endfor %}
+                        {% endif %}
+                    </ul>
+                </section>
+
+                {% if skills %}
+                <section class="sidebar-section">
+                    <h2>Skills</h2>
+                    <ul class="rating-list">
+                        {% for skill in skills %}
+                            {% if skill.level == 'None' %}
+                                <li><span>• <strong>{{ skill.name }}</strong></span></li>
+                            {% else %}
+                                <li><span>• <strong>{{ skill.name }}:</strong> {{ skill.level }}</span></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </section>
+                {% endif %}
+
+                {% if languages %}
+                <section class="sidebar-section">
+                    <h2>Languages</h2>
+                    <ul class="personal-info">
+                        {% for lang in languages %}
+                        <li><span>• <strong>{{ lang.name }}:</strong> {{ lang.level }}</span></li>
+                        {% endfor %}
+                    </ul>
+                </section>
+                {% endif %}
+            </div>
+            <div class="sidebar-bottom-wave"></div>
+        </aside>
+
+        <main class="main-content">
+            {% if education %}
+            <section class="main-section">
+                <h2>Education</h2>
+                {% for edu in education %}
+                <div class="entry-header">
+                    <span class="entry-title">{{ edu.degree }} of {{ edu.field_of_study }}</span>
+                    <span class="entry-date">{{ edu.graduation_year }}</span>
+                </div>
+                <div class="entry-subtitle">{{ edu.institution }}</div>
+                {% endfor %}
+            </section>
+            {% endif %}
+
+            {% if experience %}
+            <section class="main-section">
+                <h2>Employment</h2>
+                {% for job in experience %}
+                <div class="entry-header">
+                    <span class="entry-title">{{ job.title }}</span>
+                    <span class="entry-date">{{ job.start_date }} - {{ job.end_date |default:"" }}</span>
+                </div>
+                <div class="entry-subtitle project-title">{{ job.company_name }}</div>
+                <ul class="description-list">
+                    <li>{{ job.description }}</li>
+                </ul>
+                {% endfor %}
+            </section>
+            {% endif %}
+        </main>
+    </div>
+</body>
+</html>

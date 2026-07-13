@@ -1,0 +1,421 @@
+/* =========================================================
+   Blueprint — resume template
+   Drafting-table concept: navy scale rail + warm paper field,
+   condensed grotesk display, mono measurement labels,
+   tick-ruler timeline instead of a dotted spine.
+   ========================================================= */
+
+@page {
+    size: A4;
+    margin: 0;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --rail: #0F2438;
+    --rail-text: #EDEBE3;
+    --rail-dim: #8FA3B5;
+    --paper: #F7F5F0;
+    --ink: #1B1F24;
+    --ink-dim: #565B62;
+    --accent: #E2672A;
+    --line: #D8D3C6;
+}
+
+body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    background-color: #ffffff;
+    color: var(--ink);
+}
+
+@media screen {
+    body {
+        background-color: #E4E2DC;
+        display: flex;
+        justify-content: center;
+        padding: 24px 0;
+    }
+}
+
+.sheet {
+    width: 800px;
+    min-height: 1130px;
+    background-color: var(--paper);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+    display: flex;
+    overflow: hidden;
+}
+
+/* --- RAIL (sidebar) --- */
+.rail {
+    flex: none;
+    width: 250px;
+    background-color: var(--rail);
+    color: var(--rail-text);
+    padding: 40px 26px 30px;
+    position: relative;
+}
+
+.rail-mark {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    letter-spacing: .14em;
+    color: var(--rail-dim);
+    margin-bottom: 22px;
+}
+
+.frame-photo {
+    width: 108px;
+    height: 108px;
+    position: relative;
+    margin-bottom: 22px;
+}
+
+.frame-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.corner {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-color: var(--accent);
+    border-style: solid;
+    z-index: 2;
+}
+.corner-tl { top: -4px; left: -4px; border-width: 2px 0 0 2px; }
+.corner-tr { top: -4px; right: -4px; border-width: 2px 2px 0 0; }
+.corner-bl { bottom: -4px; left: -4px; border-width: 0 0 2px 2px; }
+.corner-br { bottom: -4px; right: -4px; border-width: 0 2px 2px 0; }
+
+.rail-name {
+    font-family: 'Space Grotesk', 'Helvetica Neue', sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    line-height: 1.15;
+    text-transform: uppercase;
+    letter-spacing: .01em;
+    color: #ffffff;
+}
+
+.rail-role {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--accent);
+    margin-top: 10px;
+}
+
+.rail-divider {
+    height: 1px;
+    background: linear-gradient(to right, rgba(237,235,227,.28), rgba(237,235,227,0));
+    margin: 22px 0;
+}
+
+.rail-heading {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--rail-dim);
+    margin-bottom: 12px;
+}
+
+.rail-list {
+    list-style: none;
+    font-size: 11px;
+    line-height: 1.9;
+    color: var(--rail-text);
+}
+
+.rail-list li {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.rail-list i {
+    color: var(--accent);
+    width: 12px;
+    font-size: 10px;
+}
+
+.rail-list a {
+    color: inherit;
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.rail-list-plain li {
+    justify-content: flex-start;
+    gap: 6px;
+}
+
+.lang-name {
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.lang-dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background-color: var(--rail-dim);
+    display: inline-block;
+}
+
+/* --- gauges (skills) --- */
+.gauge-list {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+}
+
+.gauge-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    margin-bottom: 5px;
+}
+
+.gauge-index {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 9.5px;
+    color: var(--rail-dim);
+}
+
+.gauge-track {
+    position: relative;
+    width: 100%;
+    height: 5px;
+    background-color: rgba(237,235,227,.15);
+    border-radius: 1px;
+}
+
+.gauge-fill {
+    height: 100%;
+    background-color: var(--accent);
+}
+
+.gauge-ticks {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.gauge-ticks span {
+    width: 1px;
+    height: 100%;
+    background-color: rgba(15,36,56,.4);
+}
+
+/* --- MAIN --- */
+.drafting {
+    flex: 1;
+    padding: 44px 40px 30px;
+    min-width: 0;
+}
+
+.section {
+    margin-bottom: 28px;
+}
+
+.section-title {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--ink);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+}
+
+.section-code {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    color: var(--accent);
+}
+
+.summary-text {
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: #33383F;
+}
+
+/* --- SCALE (timeline as a drafting ruler) --- */
+.scale {
+    position: relative;
+    padding-left: 78px;
+}
+
+.scale-rule {
+    position: absolute;
+    left: 66px;
+    top: 4px;
+    bottom: 4px;
+    width: 1px;
+    background-color: var(--line);
+}
+
+.scale-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.scale-item:last-child { margin-bottom: 0; }
+
+.scale-tick {
+    position: absolute;
+    left: 63px;
+    top: 3px;
+    width: 7px;
+    height: 7px;
+    background-color: var(--accent);
+    transform: rotate(45deg);
+}
+
+.scale-tick-alt {
+    background-color: var(--rail);
+}
+
+.scale-date {
+    position: absolute;
+    left: -78px;
+    top: 1px;
+    width: 66px;
+    text-align: right;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 9.5px;
+    color: var(--ink-dim);
+    line-height: 1.4;
+}
+
+.scale-date-inline {
+    position: static;
+    text-align: left;
+    width: auto;
+    margin: 3px 0 6px;
+}
+
+.scale-body {
+    padding-left: 18px;
+}
+
+.entry-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+}
+
+.entry-title {
+    font-weight: 600;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13.5px;
+    color: var(--ink);
+}
+
+.entry-subtitle {
+    font-size: 12px;
+    color: var(--ink-dim);
+    font-style: italic;
+    margin: 2px 0 6px;
+}
+
+.entry-desc {
+    font-size: 11.5px;
+    line-height: 1.6;
+    color: #33383F;
+}
+
+/* --- PROJECTS --- */
+.blueprint-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.bp-card {
+    position: relative;
+    background-color: #ffffff;
+    border: 1px solid var(--line);
+    padding: 16px 16px 14px;
+}
+
+.bp-card-index {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 9.5px;
+    color: var(--rail-dim);
+}
+
+.bp-link {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    color: var(--accent);
+    display: inline-block;
+    margin-top: 6px;
+    word-break: break-all;
+    text-decoration: none;
+}
+
+/* --- CERTIFICATIONS --- */
+.cert-list {
+    list-style: none;
+}
+
+.cert-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 12px;
+    margin-bottom: 10px;
+    padding-left: 18px;
+    position: relative;
+}
+
+.cert-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 5px;
+    width: 7px;
+    height: 7px;
+    background-color: var(--accent);
+    transform: rotate(45deg);
+}
+
+.cert-name {
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.cert-issuer {
+    color: var(--ink-dim);
+}
+
+.cert-date {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    color: var(--ink-dim);
+    margin-left: auto;
+}

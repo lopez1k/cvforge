@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV_{{ resume.personal_info.first_name }}_{{ resume.personal_info.last_name|default:"Resume" }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ css_path }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="drawer">
+
+        <!-- ===================== HEADER CARD ===================== -->
+        <header class="card card-header">
+            <div class="perforation">
+                {% for i in "123456789012345678901234"|make_list %}<span></span>{% endfor %}
+            </div>
+            <div class="card-tab">No. 00 &middot; Identity</div>
+
+            <div class="header-row">
+                {% if personal_info.photo %}
+                <div class="id-photo">
+                    <img src="{{ personal_info.photo.url }}" alt="{{ personal_info.first_name }}">
+                </div>
+                {% endif %}
+                <div class="header-text">
+                    <h1 class="header-name">{{ personal_info.first_name }} <em>{{ personal_info.last_name }}</em></h1>
+                    <p class="header-role">{{ resume.title }}</p>
+                </div>
+            </div>
+
+            <div class="contact-strip">
+                {% if personal_info.email %}<span class="contact-item"><i class="fa-solid fa-envelope"></i>{{ personal_info.email }}</span>{% endif %}
+                {% if personal_info.phone_number %}<span class="contact-item"><i class="fa-solid fa-phone"></i>{{ personal_info.phone_number }}</span>{% endif %}
+                {% if personal_info.birth_date %}<span class="contact-item"><i class="fa-solid fa-calendar-days"></i>{{ personal_info.birth_date }}</span>{% endif %}
+                {% for link in links %}
+                <span class="contact-item">
+                    {% if link.platform == "linkedin" %}<i class="fa-brands fa-linkedin"></i>
+                    {% elif link.platform == "github" %}<i class="fa-brands fa-github"></i>
+                    {% elif link.platform == "gitlab" %}<i class="fa-brands fa-gitlab"></i>
+                    {% elif link.platform == "telegram" %}<i class="fa-brands fa-telegram"></i>
+                    {% else %}<i class="fa-solid fa-link"></i>{% endif %}
+                    <a href="{{ link.url }}">{{ link.url|cut:"https://"|cut:"http://" }}</a>
+                </span>
+                {% endfor %}
+            </div>
+        </header>
+
+        {% if resume.summary %}
+        <section class="card">
+            <div class="card-tab">No. 01 &middot; Profile</div>
+            <p class="summary-text">{{ resume.summary }}</p>
+        </section>
+        {% endif %}
+
+        {% if experience %}
+        <section class="card">
+            <div class="card-tab">No. 02 &middot; Employment</div>
+            {% for job in experience %}
+            <div class="record">
+                <div class="record-stub">{{ job.start_date|date:"Y" }}&ndash;{{ job.end_date|date:"Y"|default:"now" }}</div>
+                <div class="record-body">
+                    <div class="entry-row">
+                        <span class="entry-title">{{ job.title }}</span>
+                        <span class="entry-date">{{ job.start_date|date:"M Y" }} &ndash; {{ job.end_date|date:"M Y"|default:"present" }}</span>
+                    </div>
+                    <div class="entry-subtitle">{{ job.company_name }}</div>
+                    {% if job.description %}<p class="entry-desc">{{ job.description }}</p>{% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+        {% if education %}
+        <section class="card">
+            <div class="card-tab">No. 03 &middot; Education</div>
+            {% for edu in education %}
+            <div class="record">
+                <div class="record-stub">{{ edu.start_year }}&ndash;{{ edu.graduation_year }}</div>
+                <div class="record-body">
+                    <div class="entry-row">
+                        <span class="entry-title">{{ edu.degree }} &mdash; {{ edu.field_of_study }}</span>
+                    </div>
+                    <div class="entry-subtitle">{{ edu.institution }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+        {% if projects %}
+        <section class="card">
+            <div class="card-tab">No. 04 &middot; Pet-projects</div>
+            <div class="project-shelf">
+                {% for project in projects %}
+                <div class="project-slip">
+                    <div class="entry-row">
+                        <span class="entry-title">{{ project.title }}</span>
+                        {% if project.start_date %}
+                        <span class="entry-date">{{ project.start_date }}{% if project.end_date %} &ndash; {{ project.end_date }}{% endif %}</span>
+                        {% endif %}
+                    </div>
+                    {% if project.description %}<p class="entry-desc">{{ project.description }}</p>{% endif %}
+                    {% if project.link %}<a class="project-link" href="{{ project.link }}">{{ project.link|cut:"https://"|cut:"http://" }}</a>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        {% if certifications %}
+        <section class="card">
+            <div class="card-tab">No. 05 &middot; Certifications</div>
+            <ul class="cert-list">
+                {% for cert in certifications %}
+                <li class="cert-item">
+                    <span class="cert-name">{{ cert.name }}</span>
+                    {% if cert.issuing_organization %}<span class="cert-issuer">{{ cert.issuing_organization }}</span>{% endif %}
+                    {% if cert.issue_date %}<span class="cert-date">{{ cert.issue_date }}</span>{% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
+
+        <div class="card-pair">
+            {% if skills %}
+            <section class="card card-half">
+                <div class="card-tab">No. 06 &middot; Skills</div>
+                <div class="chip-list">
+                    {% for skill in skills %}
+                    <div class="skill-chip">
+                        <span class="skill-name">{{ skill.name }}</span>
+                        <div class="skill-track"><div class="skill-fill" style="width: {% widthratio skill.level_as_number 5 100 %}%;"></div></div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            {% if languages %}
+            <section class="card card-half">
+                <div class="card-tab">No. 07 &middot; Languages</div>
+                <div class="chip-list">
+                    {% for lang in languages %}
+                    <span class="lang-chip"><strong>{{ lang.name }}</strong> &middot; {{ lang.level }}</span>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+        </div>
+
+    </div>
+
+</body>
+</html>

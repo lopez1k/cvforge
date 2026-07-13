@@ -1,0 +1,11 @@
+Django==5.2.16
+django-cors-headers==4.9.0
+djangorestframework==3.17.1
+djangorestframework_simplejwt==5.5.1
+dotenv==0.9.9
+drf-writable-nested==0.7.2
+fastapi==0.139.0
+gunicorn==26.0.0
+psycopg2-binary==2.9.12
+python-dotenv==1.2.2
+weasyprint==69.0
