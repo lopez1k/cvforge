@@ -76,8 +76,6 @@
   </div>
 </div>
 
-
-
 <!-- ============ TEMPLATE EXPORT MODAL ============ -->
 <div id="templateModal" class="modal-overlay hidden">
   <div class="modal window-chrome">
@@ -95,6 +93,31 @@
       <button type="button" id="templateModalCancel" class="btn btn-ghost btn-block" style="margin-top:1rem;">
         Скасувати
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SHARE / PUBLIC LINK MODAL ============ -->
+<div id="shareModal" class="modal-overlay hidden">
+  <div class="modal window-chrome">
+    <div class="window-titlebar">
+      <div class="window-dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+      <div class="window-tab">share.link</div>
+    </div>
+    <div class="modal-body">
+      <p class="eyebrow">// публічний доступ увімкнено</p>
+      <h2 class="modal-title">Посилання на резюме</h2>
+      <p class="modal-sub">Будь-хто з цим посиланням зможе переглянути це резюме, навіть без акаунту</p>
+
+      <div class="field">
+        <input type="text" id="shareLinkInput" class="input" readonly>
+      </div>
+
+      <div class="auth-actions">
+        <button type="button" id="shareCopyBtn" class="btn btn-accent btn-block">📋 Скопіювати посилання</button>
+        <button type="button" id="shareUnpublishBtn" class="btn btn-danger-outline btn-block">🔒 Зняти з публічного доступу</button>
+        <button type="button" id="shareModalClose" class="btn btn-ghost btn-block">Закрити</button>
+      </div>
     </div>
   </div>
 </div>

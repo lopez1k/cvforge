@@ -1,4 +1,7 @@
+
 const API_BASE_URL = 'https://cvforge.mudev.agency/api';
+const API_BASE = 'https://cvforge.mudev.agency';
+
 
 const STORAGE_KEYS = {
   access: 'access_token',
@@ -187,7 +190,25 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('showRegisterBtn').addEventListener('click', () => showAuthView('register'));
   document.getElementById('showLoginBtn').addEventListener('click', () => showAuthView('login'));
   document.getElementById('refreshBtn').addEventListener('click', fetchResumes);
- 
+
+  document.getElementById('shareModalClose').addEventListener('click', () => {
+    document.getElementById('shareModal').classList.add('hidden');
+  });
+  document.getElementById('shareCopyBtn').addEventListener('click', copyShareLink);
+  document.getElementById('shareUnpublishBtn').addEventListener('click', async () => {
+    if (!currentShareResumeId) return;
+    const id = currentShareResumeId;
+    const data = await setResumePublicState(id, false);
+    if (data) {
+      showToast('Резюме знову приватне.', 'success');
+      updateShareButtonState(id, false);
+      document.getElementById('shareModal').classList.add('hidden');
+      currentShareResumeId = null;
+    } else {
+      showToast('Не вдалося зняти публічний доступ.', 'error');
+    }
+  });
+
   const token = localStorage.getItem(STORAGE_KEYS.access);
   if (token) {
     document.getElementById('authModal').classList.add('hidden');
@@ -267,13 +288,15 @@ function renderResumes(resumes) {
   list.innerHTML = resumes.map(r => `
     <div class="resume-card" data-id="${r.id}">
       <div class="resume-card-top">
-        <p class="eyebrow">${fileNameFor(r)}</p>
+        <p class="eyebrow" id="publicStatus-${r.id}">${fileNameFor(r)}${r.is_public ? ' · 🌐 публічне' : ''}</p>
         <h3 class="resume-title">${escapeHtml(r.title) || 'Без назви'}</h3>
         <p class="resume-meta">Створено ${formatDate(r.created_at)} · Оновлено ${formatDate(r.updated_at)}</p>
       </div>
       <div class="resume-actions">
         <a href="index.html?resume=${r.id}" class="btn btn-outline btn-sm">✎ Редагувати</a>
         <button type="button" class="btn btn-accent-2 btn-sm" data-action="export" data-id="${r.id}">📥 Експорт</button>
+        <button type="button" class="btn btn-outline btn-sm" data-action="share" data-id="${r.id}">${r.is_public ? '🔗 Посилання' : '🔗 Поділитись'}</button>
+        ${r.is_public ? `<button type="button" class="btn btn-ghost btn-sm" data-action="unshare" data-id="${r.id}">🔒 Зняти з публічного</button>` : ''}
         <button type="button" class="btn btn-danger-outline btn-sm" data-action="delete" data-id="${r.id}">✕ Видалити</button>
       </div>
     </div>
@@ -281,6 +304,12 @@ function renderResumes(resumes) {
  
   list.querySelectorAll('[data-action="export"]').forEach(btn => {
     btn.addEventListener('click', () => handleExport(btn));
+  });
+  list.querySelectorAll('[data-action="share"]').forEach(btn => {
+    btn.addEventListener('click', () => handleShare(btn));
+  });
+  list.querySelectorAll('[data-action="unshare"]').forEach(btn => {
+    btn.addEventListener('click', () => handleUnshare(btn));
   });
   list.querySelectorAll('[data-action="delete"]').forEach(btn => {
     btn.addEventListener('click', () => handleDelete(btn));
@@ -293,6 +322,123 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 /* ============================================================
+   Share (робить резюме публічним/приватним і показує посилання)
+   ============================================================ */
+let currentShareResumeId = null;
+
+// Ендпоінт resumes/<id>/ приймає multipart/form-data, тож шлемо FormData, а не JSON.
+// Повертає оновлений об'єкт резюме (з public_slug/is_public) або null при помилці.
+async function setResumePublicState(id, isPublic) {
+  try {
+    const formData = new FormData();
+    formData.append('is_public', isPublic ? 'true' : 'false');
+
+    const response = await authFetch(`${API_BASE_URL}/resumes/${id}/`, {
+      method: 'PATCH',
+      body: formData,
+    });
+    if (!response || !response.ok) return null;
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+// Оновлює вигляд кнопок і мітки "🌐 публічне" конкретної картки без повного перезавантаження списку
+function updateShareButtonState(id, isPublic) {
+  const card = document.querySelector(`.resume-card[data-id="${id}"]`);
+  if (!card) return;
+
+  const statusEl = document.getElementById(`publicStatus-${id}`);
+  if (statusEl) {
+    const baseName = `resume_${String(id).padStart(3, '0')}.json`;
+    statusEl.textContent = baseName + (isPublic ? ' · 🌐 публічне' : '');
+  }
+
+  const shareBtn = card.querySelector('[data-action="share"]');
+  if (shareBtn) shareBtn.textContent = isPublic ? '🔗 Посилання' : '🔗 Поділитись';
+
+  let unshareBtn = card.querySelector('[data-action="unshare"]');
+  if (isPublic && !unshareBtn && shareBtn) {
+    unshareBtn = document.createElement('button');
+    unshareBtn.type = 'button';
+    unshareBtn.className = 'btn btn-ghost btn-sm';
+    unshareBtn.dataset.action = 'unshare';
+    unshareBtn.dataset.id = id;
+    unshareBtn.textContent = '🔒 Зняти з публічного';
+    unshareBtn.addEventListener('click', () => handleUnshare(unshareBtn));
+    shareBtn.insertAdjacentElement('afterend', unshareBtn);
+  } else if (!isPublic && unshareBtn) {
+    unshareBtn.remove();
+  }
+}
+
+// Клік по "Поділитись"/"Посилання" — спершу просимо обрати шаблон
+function handleShare(btn) {
+  const id = btn.dataset.id;
+  openTemplateModal('share', id, btn);
+}
+
+// Виконується після вибору шаблону в модалці: вмикає публічний доступ
+// і формує посилання з підставленим шаблоном
+async function performShare(id, template, btn, originalLabel) {
+  btn.disabled = true;
+  btn.textContent = 'Ділимось...';
+
+  const data = await setResumePublicState(id, true);
+
+  btn.disabled = false;
+  btn.textContent = originalLabel;
+
+  if (!data) {
+    showToast('Не вдалося увімкнути публічний доступ.', 'error');
+    return;
+  }
+
+  const publicUrl = `${API_BASE}/resume/${data.slug}/?template=${encodeURIComponent(template)}`;
+
+  currentShareResumeId = id;
+  document.getElementById('shareLinkInput').value = publicUrl;
+  document.getElementById('shareModal').classList.remove('hidden');
+  updateShareButtonState(id, true);
+}
+
+// Кнопка "Зняти з публічного" прямо на картці — без вибору шаблону
+async function handleUnshare(btn) {
+  const id = btn.dataset.id;
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Знімаємо...';
+
+  const data = await setResumePublicState(id, false);
+
+  btn.disabled = false;
+
+  if (!data) {
+    showToast('Не вдалося зняти публічний доступ.', 'error');
+    btn.textContent = originalLabel;
+    return;
+  }
+
+  showToast('Резюме знову приватне.', 'success');
+  updateShareButtonState(id, false);
+}
+
+async function copyShareLink() {
+  const input = document.getElementById('shareLinkInput');
+  input.select();
+  input.setSelectionRange(0, 99999);
+
+  try {
+    await navigator.clipboard.writeText(input.value);
+    showToast('Посилання скопійовано в буфер обміну!', 'success');
+  } catch (_) {
+    showToast('Не вдалося скопіювати автоматично, скопіюйте вручну.', 'error');
+  }
+}
+
+/* ============================================================
    Export templates
    ============================================================ */
 const EXPORT_TEMPLATES = [
@@ -304,10 +450,10 @@ const EXPORT_TEMPLATES = [
   { id: 'claude_template_04', label: 'Claude — Template 04' },
 ];
  
-let pendingExport = null; // { id, btn, originalLabel }
+let pendingAction = null; // { mode: 'export' | 'share', id, btn, originalLabel }
  
-function openTemplateModal(id, btn) {
-  pendingExport = { id, btn, originalLabel: btn.textContent };
+function openTemplateModal(mode, id, btn) {
+  pendingAction = { mode, id, btn, originalLabel: btn.textContent };
  
   const list = document.getElementById('templateList');
   list.innerHTML = EXPORT_TEMPLATES.map(t => `
@@ -320,9 +466,13 @@ function openTemplateModal(id, btn) {
   list.querySelectorAll('.template-option').forEach(opt => {
     opt.addEventListener('click', () => {
       document.getElementById('templateModal').classList.add('hidden');
-      const { id: resumeId, btn: exportBtn, originalLabel } = pendingExport;
-      performExport(resumeId, opt.dataset.template, exportBtn, originalLabel);
-      pendingExport = null;
+      const { mode: actionMode, id: resumeId, btn: actionBtn, originalLabel } = pendingAction;
+      if (actionMode === 'share') {
+        performShare(resumeId, opt.dataset.template, actionBtn, originalLabel);
+      } else {
+        performExport(resumeId, opt.dataset.template, actionBtn, originalLabel);
+      }
+      pendingAction = null;
     });
   });
  
@@ -331,7 +481,7 @@ function openTemplateModal(id, btn) {
  
 function handleExport(btn) {
   const id = btn.dataset.id;
-  openTemplateModal(id, btn);
+  openTemplateModal('export', id, btn);
 }
  
 async function performExport(id, template, btn, originalLabel) {
@@ -363,7 +513,7 @@ async function performExport(id, template, btn, originalLabel) {
  
 document.getElementById('templateModalCancel').addEventListener('click', () => {
   document.getElementById('templateModal').classList.add('hidden');
-  pendingExport = null;
+  pendingAction = null;
 });
  
 /* ============================================================

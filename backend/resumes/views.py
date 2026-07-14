@@ -137,3 +137,33 @@ def register_user(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+@authentication_classes([])
+def public_resume(request, slug):
+    template = str(request.GET.get('template'))
+    resume = get_object_or_404(Resume, slug = slug, is_public = True)
+    skill_levels = {
+        'None': 0,
+        'Novice': 1,
+        'Advanced Beginner': 2,
+        'Competent': 3,
+        'Proficient': 4,
+        'Expert': 5,
+    }
+    html_content = render_to_string(f'resumes/{template}/resume_pdf.html', context = {
+        'css_path': f'/static/templates/resumes/{template}/static/css/styles.css', 
+        'resume': resume, 
+        'personal_info' : resume.personal_info,
+        'experience': resume.experience.all,
+        'education': resume.education.all,
+        'languages': resume.languages.all,
+        'links': resume.links.all,
+        'skills': resume.skills.all,
+        'skill_levels': skill_levels,
+        'projects': resume.projects.all,
+        'certifications': resume.certifications.all
+    })
+    return HttpResponse(html_content)
