@@ -21,26 +21,58 @@
       <div class="window-tab">auth.login</div>
     </div>
     <div class="modal-body">
-      <p class="eyebrow">// потрібна автентифікація</p>
-      <h2 class="modal-title">Вхід у CVForge</h2>
-      <p class="modal-sub">Отримайте JWT-токен, щоб побачити свої резюме</p>
 
-      <form id="loginForm" novalidate>
-        <div class="field">
-          <label for="username">Ім'я користувача</label>
-          <input type="text" id="username" class="input" required placeholder="Ваш username в Django" autocomplete="username">
-        </div>
-        <div class="field">
-          <label for="password">Пароль</label>
-          <input type="password" id="password" class="input" required placeholder="••••••••" autocomplete="current-password">
-        </div>
-        <p id="loginError" class="form-error hidden"></p>
-        <button type="submit" class="btn btn-accent btn-block">Увійти та почати</button>
-      </form>
+      <!-- ---- LOGIN VIEW ---- -->
+      <div id="loginView">
+        <p class="eyebrow">// потрібна автентифікація</p>
+        <h2 class="modal-title">Вхід у CVForge</h2>
+        <p class="modal-sub">Отримайте JWT-токен, щоб почати збирати резюме</p>
+
+        <form id="loginForm" novalidate>
+          <div class="field">
+            <label for="username">Ім'я користувача</label>
+            <input type="text" id="username" class="input" required placeholder="Ваш username в Django" autocomplete="username">
+          </div>
+          <div class="field">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" class="input" required placeholder="••••••••" autocomplete="current-password">
+          </div>
+          <p id="loginError" class="form-error hidden"></p>
+
+          <div class="auth-actions">
+            <button type="submit" class="btn btn-accent btn-block">Увійти та почати</button>
+            <button type="button" id="showRegisterBtn" class="btn btn-outline btn-block">Зареєструватись</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ---- REGISTER VIEW ---- -->
+      <div id="registerView" class="hidden">
+        <p class="eyebrow">// новий акаунт</p>
+        <h2 class="modal-title">Реєстрація в CVForge</h2>
+        <p class="modal-sub">Створіть логін і пароль, щоб почати збирати резюме</p>
+
+        <form id="registerForm" novalidate>
+          <div class="field">
+            <label for="regUsername">Ім'я користувача</label>
+            <input type="text" id="regUsername" class="input" required placeholder="Придумайте username" autocomplete="username">
+          </div>
+          <div class="field">
+            <label for="regPassword">Пароль</label>
+            <input type="password" id="regPassword" class="input" required placeholder="••••••••" autocomplete="new-password">
+          </div>
+          <p id="registerError" class="form-error hidden"></p>
+
+          <div class="auth-actions">
+            <button type="submit" class="btn btn-accent btn-block">Зареєструватись</button>
+            <button type="button" id="showLoginBtn" class="btn btn-ghost btn-block">← Назад до входу</button>
+          </div>
+        </form>
+      </div>
+
     </div>
   </div>
 </div>
-
 
 <!-- ============ TEMPLATE EXPORT MODAL ============ -->
 <div id="templateModal" class="modal-overlay hidden">
@@ -63,6 +95,31 @@
   </div>
 </div>
 
+<!-- ============ SHARE / PUBLIC LINK MODAL ============ -->
+<div id="shareModal" class="modal-overlay hidden">
+  <div class="modal window-chrome">
+    <div class="window-titlebar">
+      <div class="window-dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+      <div class="window-tab">share.link</div>
+    </div>
+    <div class="modal-body">
+      <p class="eyebrow">// публічний доступ увімкнено</p>
+      <h2 class="modal-title">Посилання на резюме</h2>
+      <p class="modal-sub">Будь-хто з цим посиланням зможе переглянути це резюме, навіть без акаунту</p>
+
+      <div class="field">
+        <input type="text" id="shareLinkInput" class="input" readonly>
+      </div>
+
+      <div class="auth-actions">
+        <button type="button" id="shareCopyBtn" class="btn btn-accent btn-block">📋 Скопіювати посилання</button>
+        <button type="button" id="shareUnpublishBtn" class="btn btn-danger-outline btn-block">🔒 Зняти з публічного доступу</button>
+        <button type="button" id="shareModalClose" class="btn btn-ghost btn-block">Закрити</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ============ APP SHELL ============ -->
 <div class="app-shell">
 
@@ -72,7 +129,7 @@
       <span class="brand-path">~/cvforge</span>
     </div>
     <div class="topbar-actions">
-      <a href="index.html" id="newResumeBtn" class="btn btn-outline btn-sm">+ Нове резюме</a>
+      <a href="/" id="newResumeBtn" class="btn btn-outline btn-sm">+ Нове резюме</a>
       <button id="logoutBtn" class="btn btn-ghost btn-sm">Вийти з акаунту</button>
     </div>
   </header>
@@ -98,7 +155,7 @@
       <div id="emptyState" class="empty-state hidden">
         Резюме ще не створено.
         <br><br>
-        <a href="index.html" class="btn btn-accent btn-sm">+ Створити перше резюме</a>
+        <a href="/" class="btn btn-accent btn-sm">+ Створити перше резюме</a>
       </div>
     </div>
   </div>
