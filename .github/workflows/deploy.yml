@@ -11,20 +11,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy Backend
+      - name: Sync and Deploy
         run: |
-          cd /var/www/cvforgebackend/
+          cd /var/www/cvforge-source/
           git pull origin main
+          
+          rsync -av --delete /var/www/cvforge-source/backend/ /var/www/cvforgebackend/
+          rsync -av --delete /var/www/cvforge-source/frontend/ /var/www/cvforge/
+        
+          cd /var/www/cvforgebackend/
           source .venv/bin/activate
           pip install -r requirements.txt
           python manage.py migrate
           sudo systemctl restart cvforgeapi
-
-      - name: Deploy Frontend
-        run: |
+        
           cd /var/www/cvforge/
-          git pull origin main
-
-      - name: Restart Nginx
-        run: |
           sudo systemctl restart nginx
