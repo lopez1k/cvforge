@@ -20,9 +20,9 @@ jobs:
           rsync -av --delete /var/www/cvforge-source/frontend/ /var/www/cvforge/ || true
         
           cd /var/www/cvforgebackend/
-          source .venv/bin/activate
-          pip install -r requirements.txt
-          python manage.py migrate
+          source /var/www/cvforgebackend/.venv/bin/activate
+          pip3 install -r requirements.txt
+          python3 manage.py migrate
           sudo systemctl restart cvforgeapi
         
           cd /var/www/cvforge/
