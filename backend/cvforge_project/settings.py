@@ -55,6 +55,7 @@ INSTALLED_APPS = [
 ]
 CORS_ALLOWED_ORIGINS = [
     "https://cvforge.mudev.agency",
+    "http://localhost",
 ]
 
 MIDDLEWARE = [

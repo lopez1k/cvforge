@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://cvforge.mudev.agency/api';
+const API_BASE_URL = 'http://localhost:8000/api';
 
 const STORAGE_KEYS = {
   access: 'access_token',
