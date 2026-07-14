@@ -8,7 +8,7 @@ class Resume(models.Model):
         related_name='resumes')
     title = models.CharField(verbose_name = "Назва", max_length = 255)
     summary = models.TextField(verbose_name = "Опис", max_length = 255, null = True, blank = True)
-    slug = models.UUIDField(default=uuid.uuid4, editable = False, unique = False)
+    slug = models.UUIDField(default=uuid.uuid4, editable = False, unique = True)
     is_public = models.BooleanField(default = False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
