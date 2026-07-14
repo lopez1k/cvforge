@@ -1,0 +1,30 @@
+name: Deploy CVForge
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy Backend
+        run: |
+          cd /var/www/cvforgebackend/
+          git pull origin main
+          source .venv/bin/activate
+          pip install -r requirements.txt
+          python manage.py migrate
+          sudo systemctl restart cvforgeapi
+
+      - name: Deploy Frontend
+        run: |
+          cd /var/www/cvforge/
+          git pull origin main
+
+      - name: Restart Nginx
+        run: |
+          sudo systemctl restart nginx
