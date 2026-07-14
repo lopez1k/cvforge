@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import Resume, PersonalInfo, WorkExperience, Education, ProjectLink, Language, Project, Certification, Skills
 from drf_writable_nested.serializers import WritableNestedModelSerializer
+from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
 
 class LanguageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -64,4 +66,21 @@ class ResumeSerializer(WritableNestedModelSerializer):
         model = Resume
         fields = ['id', 'user', 'title', 'summary', 'personal_info', 'experience', 'education', 'links', 'skills', 'languages', 'projects', 'certifications', 'created_at', 'updated_at']
 
-    
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+ 
+    class Meta:
+        model = User
+        fields = ['username', 'password']
+ 
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("Користувач з таким ім'ям вже існує.")
+        return value
+ 
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            password=validated_data['password'],
+        )
+        return user
