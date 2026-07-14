@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = 'https://cvforge.mudev.agency/api';
 
 const STORAGE_KEYS = {
   access: 'access_token',
@@ -115,6 +115,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('saveBtn').addEventListener('click', handleSave);
   document.getElementById('logoutBtn').addEventListener('click', logout);
   document.getElementById('loginForm').addEventListener('submit', handleLogin);
+  document.getElementById('registerForm').addEventListener('submit', handleRegister);
+  document.getElementById('showRegisterBtn').addEventListener('click', () => showAuthView('register'));
+  document.getElementById('showLoginBtn').addEventListener('click', () => showAuthView('login'));
 
   const token = localStorage.getItem(STORAGE_KEYS.access);
   if (token) document.getElementById('authModal').classList.add('hidden');
@@ -181,6 +184,59 @@ async function handleLogin(event) {
   } catch (error) {
     console.error('Помилка авторизації:', error);
     errorEl.textContent = 'Не вдалося з’єднатися з сервером токенів.';
+    errorEl.classList.remove('hidden');
+  }
+}
+
+function showAuthView(view) {
+  const loginView = document.getElementById('loginView');
+  const registerView = document.getElementById('registerView');
+  const loginError = document.getElementById('loginError');
+  const registerError = document.getElementById('registerError');
+
+  if (view === 'register') {
+    loginView.classList.add('hidden');
+    registerView.classList.remove('hidden');
+  } else {
+    registerView.classList.add('hidden');
+    loginView.classList.remove('hidden');
+  }
+  loginError.classList.add('hidden');
+  registerError.classList.add('hidden');
+}
+
+async function handleRegister(event) {
+  event.preventDefault();
+  const usernameInput = document.getElementById('regUsername').value;
+  const passwordInput = document.getElementById('regPassword').value;
+  const errorEl = document.getElementById('registerError');
+  errorEl.classList.add('hidden');
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/register/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: usernameInput, password: passwordInput }),
+    });
+
+    if (response.ok) {
+      showToast('Реєстрація успішна! Тепер увійдіть.', 'success');
+      document.getElementById('username').value = usernameInput;
+      document.getElementById('password').value = '';
+      document.getElementById('registerForm').reset();
+      showAuthView('login');
+    } else {
+      let message = 'Не вдалося зареєструватися. Перевірте дані.';
+      try {
+        const data = await response.json();
+        message = Object.values(data).flat().join(' ') || message;
+      } catch (_) { /* ignore parse errors */ }
+      errorEl.textContent = message;
+      errorEl.classList.remove('hidden');
+    }
+  } catch (error) {
+    console.error('Помилка реєстрації:', error);
+    errorEl.textContent = 'Не вдалося з’єднатися з сервером.';
     errorEl.classList.remove('hidden');
   }
 }

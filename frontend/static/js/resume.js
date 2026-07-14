@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = 'https://cvforge.mudev.agency/api';
 
 const STORAGE_KEYS = {
   access: 'access_token',
@@ -17,7 +17,7 @@ function showToast(message, type = 'info') {
   host.appendChild(el);
   setTimeout(() => el.remove(), 3600);
 }
-
+ 
 /* ============================================================
    Auth: login, logout, refresh-and-retry
    ============================================================ */
@@ -27,14 +27,14 @@ async function handleLogin(event) {
   const passwordInput = document.getElementById('password').value;
   const errorEl = document.getElementById('loginError');
   errorEl.classList.add('hidden');
-
+ 
   try {
     const response = await fetch(`${API_BASE_URL}/token/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: usernameInput, password: passwordInput }),
     });
-
+ 
     if (response.ok) {
       const data = await response.json();
       localStorage.setItem(STORAGE_KEYS.access, data.access);
@@ -52,18 +52,71 @@ async function handleLogin(event) {
     errorEl.classList.remove('hidden');
   }
 }
-
+ 
+function showAuthView(view) {
+  const loginView = document.getElementById('loginView');
+  const registerView = document.getElementById('registerView');
+  const loginError = document.getElementById('loginError');
+  const registerError = document.getElementById('registerError');
+ 
+  if (view === 'register') {
+    loginView.classList.add('hidden');
+    registerView.classList.remove('hidden');
+  } else {
+    registerView.classList.add('hidden');
+    loginView.classList.remove('hidden');
+  }
+  loginError.classList.add('hidden');
+  registerError.classList.add('hidden');
+}
+ 
+async function handleRegister(event) {
+  event.preventDefault();
+  const usernameInput = document.getElementById('regUsername').value;
+  const passwordInput = document.getElementById('regPassword').value;
+  const errorEl = document.getElementById('registerError');
+  errorEl.classList.add('hidden');
+ 
+  try {
+    const response = await fetch(`${API_BASE_URL}/register/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: usernameInput, password: passwordInput }),
+    });
+ 
+    if (response.ok) {
+      showToast('Реєстрація успішна! Тепер увійдіть.', 'success');
+      document.getElementById('username').value = usernameInput;
+      document.getElementById('password').value = '';
+      document.getElementById('registerForm').reset();
+      showAuthView('login');
+    } else {
+      let message = 'Не вдалося зареєструватися. Перевірте дані.';
+      try {
+        const data = await response.json();
+        message = Object.values(data).flat().join(' ') || message;
+      } catch (_) { /* ignore parse errors */ }
+      errorEl.textContent = message;
+      errorEl.classList.remove('hidden');
+    }
+  } catch (error) {
+    console.error('Помилка реєстрації:', error);
+    errorEl.textContent = 'Не вдалося з’єднатися з сервером.';
+    errorEl.classList.remove('hidden');
+  }
+}
+ 
 function logout() {
   localStorage.removeItem(STORAGE_KEYS.access);
   localStorage.removeItem(STORAGE_KEYS.refresh);
   localStorage.removeItem(STORAGE_KEYS.resumeId);
   location.reload();
 }
-
+ 
 async function refreshAccessToken() {
   const refresh = localStorage.getItem(STORAGE_KEYS.refresh);
   if (!refresh) return null;
-
+ 
   try {
     const res = await fetch(`${API_BASE_URL}/token/refresh/`, {
       method: 'POST',
@@ -71,10 +124,10 @@ async function refreshAccessToken() {
       body: JSON.stringify({ refresh }),
     });
     if (!res.ok) return null;
-
+ 
     const data = await res.json();
     if (!data.access) return null;
-
+ 
     localStorage.setItem(STORAGE_KEYS.access, data.access);
     if (data.refresh) localStorage.setItem(STORAGE_KEYS.refresh, data.refresh);
     return data.access;
@@ -83,14 +136,14 @@ async function refreshAccessToken() {
     return null;
   }
 }
-
+ 
 function handleSessionExpired() {
   localStorage.removeItem(STORAGE_KEYS.access);
   localStorage.removeItem(STORAGE_KEYS.refresh);
   showToast('Сесія застаріла. Авторизуйтесь знову.', 'error');
   document.getElementById('authModal').classList.remove('hidden');
 }
-
+ 
 async function authFetch(url, options = {}) {
   const buildOptions = (token) => ({
     ...options,
@@ -99,15 +152,15 @@ async function authFetch(url, options = {}) {
       'Authorization': `Bearer ${token}`,
     },
   });
-
+ 
   let token = localStorage.getItem(STORAGE_KEYS.access);
   if (!token) {
     document.getElementById('authModal').classList.remove('hidden');
     return null;
   }
-
+ 
   let response = await fetch(url, buildOptions(token));
-
+ 
   if (response.status === 401) {
     const newToken = await refreshAccessToken();
     if (!newToken) {
@@ -120,18 +173,21 @@ async function authFetch(url, options = {}) {
       return null;
     }
   }
-
+ 
   return response;
 }
-
+ 
 /* ============================================================
    Init
    ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('logoutBtn').addEventListener('click', logout);
   document.getElementById('loginForm').addEventListener('submit', handleLogin);
+  document.getElementById('registerForm').addEventListener('submit', handleRegister);
+  document.getElementById('showRegisterBtn').addEventListener('click', () => showAuthView('register'));
+  document.getElementById('showLoginBtn').addEventListener('click', () => showAuthView('login'));
   document.getElementById('refreshBtn').addEventListener('click', fetchResumes);
-
+ 
   const token = localStorage.getItem(STORAGE_KEYS.access);
   if (token) {
     document.getElementById('authModal').classList.add('hidden');
@@ -141,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('loadingState').classList.add('hidden');
   }
 });
-
+ 
 /* ============================================================
    Fetch + render
    ============================================================ */
@@ -150,39 +206,39 @@ function formatDate(iso) {
   const d = new Date(iso);
   return d.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
-
+ 
 function fileNameFor(resume) {
   return `resume_${String(resume.id).padStart(3, '0')}.json`;
 }
-
+ 
 async function fetchResumes() {
   const loadingState = document.getElementById('loadingState');
   const emptyState = document.getElementById('emptyState');
   const list = document.getElementById('resumeList');
-
+ 
   loadingState.classList.remove('hidden');
   emptyState.classList.add('hidden');
   list.innerHTML = '';
-
+ 
   try {
     const response = await authFetch(`${API_BASE_URL}/resumes/`, { method: 'GET' });
     if (!response) { loadingState.classList.add('hidden'); return; }
-
+ 
     if (!response.ok) {
       loadingState.classList.add('hidden');
       showToast('Не вдалося завантажити список резюме.', 'error');
       return;
     }
-
+ 
     const resumes = await response.json();
     loadingState.classList.add('hidden');
     document.getElementById('listEyebrow').textContent = `resumes/ · ${resumes.length} файл${resumes.length === 1 ? '' : 'ів'}`;
-
+ 
     if (!resumes.length) {
       emptyState.classList.remove('hidden');
       return;
     }
-
+ 
     renderResumes(resumes);
   } catch (error) {
     console.error(error);
@@ -190,8 +246,8 @@ async function fetchResumes() {
     showToast('Не вдалося з’єднатися із сервером.', 'error');
   }
 }
-
-
+ 
+ 
 document.getElementById('newResumeBtn').addEventListener('click', (e) => {
   // Очищаємо всі дані старого резюме
   localStorage.removeItem(STORAGE_KEYS.resumeId);
@@ -204,8 +260,8 @@ document.getElementById('newResumeBtn').addEventListener('click', (e) => {
      location.reload();  // Просто перезавантажуємо, щоб очистити поля
   }
 });
-
-
+ 
+ 
 function renderResumes(resumes) {
   const list = document.getElementById('resumeList');
   list.innerHTML = resumes.map(r => `
@@ -222,7 +278,7 @@ function renderResumes(resumes) {
       </div>
     </div>
   `).join('');
-
+ 
   list.querySelectorAll('[data-action="export"]').forEach(btn => {
     btn.addEventListener('click', () => handleExport(btn));
   });
@@ -230,7 +286,7 @@ function renderResumes(resumes) {
     btn.addEventListener('click', () => handleDelete(btn));
   });
 }
-
+ 
 function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str || '';
@@ -247,12 +303,12 @@ const EXPORT_TEMPLATES = [
   { id: 'claude_template_03', label: 'Claude — Template 03' },
   { id: 'claude_template_04', label: 'Claude — Template 04' },
 ];
-
+ 
 let pendingExport = null; // { id, btn, originalLabel }
-
+ 
 function openTemplateModal(id, btn) {
   pendingExport = { id, btn, originalLabel: btn.textContent };
-
+ 
   const list = document.getElementById('templateList');
   list.innerHTML = EXPORT_TEMPLATES.map(t => `
     <button type="button" class="template-option" data-template="${t.id}">
@@ -260,7 +316,7 @@ function openTemplateModal(id, btn) {
       <span class="template-option-id">${t.id}</span>
     </button>
   `).join('');
-
+ 
   list.querySelectorAll('.template-option').forEach(opt => {
     opt.addEventListener('click', () => {
       document.getElementById('templateModal').classList.add('hidden');
@@ -269,29 +325,29 @@ function openTemplateModal(id, btn) {
       pendingExport = null;
     });
   });
-
+ 
   document.getElementById('templateModal').classList.remove('hidden');
 }
-
+ 
 function handleExport(btn) {
   const id = btn.dataset.id;
   openTemplateModal(id, btn);
 }
-
+ 
 async function performExport(id, template, btn, originalLabel) {
   btn.disabled = true;
   btn.textContent = 'Готуємо...';
-
+ 
   try {
     const url = `${API_BASE_URL}/resumes/${id}/export/?template=${encodeURIComponent(template)}`;
     const response = await authFetch(url, { method: 'GET' });
     if (!response) return;
-
+ 
     if (!response.ok) {
       showToast('Не вдалося експортувати резюме.', 'error');
       return;
     }
-
+ 
     const blob = await response.blob();
     const blobUrl = URL.createObjectURL(blob);
     window.open(blobUrl, '_blank');
@@ -303,13 +359,13 @@ async function performExport(id, template, btn, originalLabel) {
     btn.textContent = originalLabel;
   }
 } 
-
-
+ 
+ 
 document.getElementById('templateModalCancel').addEventListener('click', () => {
   document.getElementById('templateModal').classList.add('hidden');
   pendingExport = null;
 });
-
+ 
 /* ============================================================
    Delete (click once to arm, click again within 4s to confirm)
    ============================================================ */
@@ -324,29 +380,29 @@ function handleDelete(btn) {
     }, 4000);
     return;
   }
-
+ 
   clearTimeout(btn._revertTimer);
   performDelete(btn);
 }
-
+ 
 async function performDelete(btn) {
   const id = btn.dataset.id;
   btn.disabled = true;
   btn.textContent = 'Видалення...';
-
+ 
   try {
     const response = await authFetch(`${API_BASE_URL}/resumes/${id}/`, { method: 'DELETE' });
     if (!response) return;
-
+ 
     if (response.ok || response.status === 204) {
       showToast('Резюме видалено.', 'success');
       const card = document.querySelector(`.resume-card[data-id="${id}"]`);
       if (card) card.remove();
-
+ 
       const remaining = document.querySelectorAll('.resume-card').length;
       document.getElementById('listEyebrow').textContent = `resumes/ · ${remaining} файл${remaining === 1 ? '' : 'ів'}`;
       if (!remaining) document.getElementById('emptyState').classList.remove('hidden');
-
+ 
       if (localStorage.getItem(STORAGE_KEYS.resumeId) === id) {
         localStorage.removeItem(STORAGE_KEYS.resumeId);
       }

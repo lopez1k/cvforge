@@ -21,22 +21,55 @@
       <div class="window-tab">auth.login</div>
     </div>
     <div class="modal-body">
-      <p class="eyebrow">// потрібна автентифікація</p>
-      <h2 class="modal-title">Вхід у CVForge</h2>
-      <p class="modal-sub">Отримайте JWT-токен, щоб почати збирати резюме</p>
 
-      <form id="loginForm" novalidate>
-        <div class="field">
-          <label for="username">Ім'я користувача</label>
-          <input type="text" id="username" class="input" required placeholder="Ваш username в Django" autocomplete="username">
-        </div>
-        <div class="field">
-          <label for="password">Пароль</label>
-          <input type="password" id="password" class="input" required placeholder="••••••••" autocomplete="current-password">
-        </div>
-        <p id="loginError" class="form-error hidden"></p>
-        <button type="submit" class="btn btn-accent btn-block">Увійти та почати</button>
-      </form>
+      <!-- ---- LOGIN VIEW ---- -->
+      <div id="loginView">
+        <p class="eyebrow">// потрібна автентифікація</p>
+        <h2 class="modal-title">Вхід у CVForge</h2>
+        <p class="modal-sub">Отримайте JWT-токен, щоб почати збирати резюме</p>
+
+        <form id="loginForm" novalidate>
+          <div class="field">
+            <label for="username">Ім'я користувача</label>
+            <input type="text" id="username" class="input" required placeholder="Ваш username в Django" autocomplete="username">
+          </div>
+          <div class="field">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" class="input" required placeholder="••••••••" autocomplete="current-password">
+          </div>
+          <p id="loginError" class="form-error hidden"></p>
+
+          <div class="auth-actions">
+            <button type="submit" class="btn btn-accent btn-block">Увійти та почати</button>
+            <button type="button" id="showRegisterBtn" class="btn btn-outline btn-block">Зареєструватись</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ---- REGISTER VIEW ---- -->
+      <div id="registerView" class="hidden">
+        <p class="eyebrow">// новий акаунт</p>
+        <h2 class="modal-title">Реєстрація в CVForge</h2>
+        <p class="modal-sub">Створіть логін і пароль, щоб почати збирати резюме</p>
+
+        <form id="registerForm" novalidate>
+          <div class="field">
+            <label for="regUsername">Ім'я користувача</label>
+            <input type="text" id="regUsername" class="input" required placeholder="Придумайте username" autocomplete="username">
+          </div>
+          <div class="field">
+            <label for="regPassword">Пароль</label>
+            <input type="password" id="regPassword" class="input" required placeholder="••••••••" autocomplete="new-password">
+          </div>
+          <p id="registerError" class="form-error hidden"></p>
+
+          <div class="auth-actions">
+            <button type="submit" class="btn btn-accent btn-block">Зареєструватись</button>
+            <button type="button" id="showLoginBtn" class="btn btn-ghost btn-block">← Назад до входу</button>
+          </div>
+        </form>
+      </div>
+
     </div>
   </div>
 </div>
@@ -82,7 +115,7 @@
       <span class="brand-path">~/cvforge</span>
     </div>
     <div class="topbar-actions">
-      <a href="resumes.html" class="btn btn-outline btn-sm">📂 Мої резюме</a>
+      <a href="resumes" class="btn btn-outline btn-sm">📂 Мої резюме</a>
       <button id="logoutBtn" class="btn btn-ghost btn-sm">Вийти з акаунту</button>
     </div>
   </header>
