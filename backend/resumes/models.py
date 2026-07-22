@@ -7,9 +7,10 @@ class Resume(models.Model):
         on_delete=models.CASCADE, 
         related_name='resumes')
     title = models.CharField(verbose_name = "Назва", max_length = 255)
-    summary = models.TextField(verbose_name = "Опис", max_length = 255, null = True, blank = True)
+    summary = models.TextField(verbose_name = "Опис", max_length = 500, null = True, blank = True)
     slug = models.UUIDField(default=uuid.uuid4, editable = False, unique = True)
     is_public = models.BooleanField(default = False)
+    language = models.CharField(verbose_name = "Мова шаблону", max_length = 4, default = "UA")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

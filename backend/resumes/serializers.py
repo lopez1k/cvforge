@@ -64,7 +64,7 @@ class ResumeSerializer(WritableNestedModelSerializer):
 
     class Meta:
         model = Resume
-        fields = ['id', 'user', 'title', 'summary', 'slug', 'is_public', 'personal_info', 'experience', 'education', 'links', 'skills', 'languages', 'projects', 'certifications', 'created_at', 'updated_at']
+        fields = ['id', 'user', 'title', 'summary', 'slug', 'is_public', 'language', 'personal_info', 'experience', 'education', 'links', 'skills', 'languages', 'projects', 'certifications', 'created_at', 'updated_at']
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])

@@ -23,7 +23,7 @@
 
             <div class="sidebar-content">
                 <section class="sidebar-section">
-                    <h2>Personal details</h2>
+                    <h2>{{ labels.personal_details }}</h2>
                     <ul class="personal-info">
                         <li><i class="fa-solid fa-user"></i> <span>{{ personal_info.first_name }} {{ personal_info.last_name }}</span></li>
                         
@@ -49,7 +49,7 @@
 
                 {% if skills %}
                 <section class="sidebar-section">
-                    <h2>Skills</h2>
+                    <h2>{{ labels.skills }}</h2>
                     <ul class="rating-list">
                         {% for skill in skills %}
                             {% if skill.level == 'None' %}
@@ -64,7 +64,7 @@
 
                 {% if languages %}
                 <section class="sidebar-section">
-                    <h2>Languages</h2>
+                    <h2>{{ labels.languages }}</h2>
                     <ul class="personal-info">
                         {% for lang in languages %}
                         <li><span>• <strong>{{ lang.name }}:</strong> {{ lang.level }}</span></li>
@@ -79,10 +79,10 @@
         <main class="main-content">
             {% if education %}
             <section class="main-section">
-                <h2>Education</h2>
+                <h2>{{ labels.education }}</h2>
                 {% for edu in education %}
                 <div class="entry-header">
-                    <span class="entry-title">{{ edu.degree }} of {{ edu.field_of_study }}</span>
+                    <span class="entry-title">{{ edu.degree }} — {{ edu.field_of_study }}</span>
                     <span class="entry-date">{{ edu.graduation_year }}</span>
                 </div>
                 <div class="entry-subtitle">{{ edu.institution }}</div>
@@ -92,11 +92,11 @@
 
             {% if experience %}
             <section class="main-section">
-                <h2>Employment</h2>
+                <h2>{{ labels.employment }}</h2>
                 {% for job in experience %}
                 <div class="entry-header">
-                    <span class="entry-title">{{ job.title }}</span>
-                    <span class="entry-date">{{ job.start_date }} - {{ job.end_date |default:"" }}</span>
+                    <span class="entry-title">{{ job.position }}</span>
+                    <span class="entry-date">{{ job.start_date }} - {{ job.end_date|default:labels.present }}</span>
                 </div>
                 <div class="entry-subtitle project-title">{{ job.company_name }}</div>
                 <ul class="description-list">

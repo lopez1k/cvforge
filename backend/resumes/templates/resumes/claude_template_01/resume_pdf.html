@@ -34,24 +34,24 @@
 
                 {% if resume.summary %}
                 <section class="block">
-                    <h2 class="block-title"><span class="mark">&#9670;</span> Profile</h2>
+                    <h2 class="block-title"><span class="mark">&#9670;</span> {{ labels.profile }}</h2>
                     <p class="summary-text">{{ resume.summary }}</p>
                 </section>
                 {% endif %}
 
                 {% if experience %}
                 <section class="block">
-                    <h2 class="block-title"><span class="mark">&#9670;</span> Employment</h2>
+                    <h2 class="block-title"><span class="mark">&#9670;</span> {{ labels.employment }}</h2>
                     <div class="ledger">
                         {% for job in experience %}
                         <div class="ledger-row">
                             <div class="ledger-date">
-                                <div class="ledger-date">{{ job.start_date|date:"M Y" }}<br>&#8595;<br>{{ job.end_date|date:"M Y"|default:"нині" }}</div>
+                                <div class="ledger-date">{{ job.start_date|date:"M Y" }}<br>&#8595;<br>{{ job.end_date|date:"M Y"|default:labels.present }}</div>
                             </div>
                             <div class="ledger-rule"></div>
                             <div class="ledger-content">
                                 <div class="entry-row">
-                                    <span class="entry-title">{{ job.title }}</span>
+                                    <span class="entry-title">{{ job.position }}</span>
                                 </div>
                                 <div class="entry-subtitle">{{ job.company_name }}</div>
                                 {% if job.description %}<p class="entry-desc">{{ job.description }}</p>{% endif %}
@@ -64,7 +64,7 @@
 
                 {% if projects %}
                 <section class="block">
-                    <h2 class="block-title"><span class="mark">&#9670;</span> Pet-projects</h2>
+                    <h2 class="block-title"><span class="mark">&#9670;</span> {{ labels.projects }}</h2>
                     <div class="project-grid">
                         {% for project in projects %}
                         <div class="project-card">
@@ -86,7 +86,7 @@
 
                 {% if education %}
                 <section class="block">
-                    <h2 class="block-title"><span class="mark">&#9670;</span> Education</h2>
+                    <h2 class="block-title"><span class="mark">&#9670;</span> {{ labels.education }}</h2>
                     <div class="ledger">
                         {% for edu in education %}
                         <div class="ledger-row">
@@ -106,7 +106,7 @@
 
                 {% if certifications %}
                 <section class="block">
-                    <h2 class="block-title"><span class="mark">&#9670;</span> Certifications</h2>
+                    <h2 class="block-title"><span class="mark">&#9670;</span> {{ labels.certifications }}</h2>
                     <ul class="cert-list">
                         {% for cert in certifications %}
                         <li class="cert-item">
@@ -125,7 +125,7 @@
             <aside class="side-col">
 
                 <section class="block">
-                    <h2 class="block-title-side">Contacts</h2>
+                    <h2 class="block-title-side">{{ labels.contacts }}</h2>
                     <ul class="contact-list">
                         {% if personal_info.email %}
                         <li><i class="fa-solid fa-envelope"></i><span>{{ personal_info.email }}</span></li>
@@ -141,7 +141,7 @@
 
                 {% if links %}
                 <section class="block">
-                    <h2 class="block-title-side">Links</h2>
+                    <h2 class="block-title-side">{{ labels.links }}</h2>
                     <ul class="contact-list">
                         {% for link in links %}
                         <li>
@@ -165,7 +165,7 @@
 
                 {% if skills %}
                 <section class="block">
-                    <h2 class="block-title-side">Skills</h2>
+                    <h2 class="block-title-side">{{ labels.skills }}</h2>
                     <ul class="bar-list">
                         {% for skill in skills %}
                         <li>
@@ -179,7 +179,7 @@
 
                 {% if languages %}
                 <section class="block">
-                    <h2 class="block-title-side">Languages</h2>
+                    <h2 class="block-title-side">{{ labels.languages }}</h2>
                     <ul class="contact-list">
                         {% for lang in languages %}
                         <li><span><strong>{{ lang.name }}</strong> — {{ lang.level }}</span></li>

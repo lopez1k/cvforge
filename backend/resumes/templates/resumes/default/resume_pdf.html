@@ -147,22 +147,22 @@
         </table>
     </div>
 
-    <h2 class="section-title">Досвід роботи</h2>
+    <h2 class="section-title">{{ labels.employment }}</h2>
     {% for exp in resume.experience.all %}
     <div class="item">
         <table class="item-header">
             <tr>
                 <td class="item-title">{{ exp.position }} <span class="item-subtitle">— {{ exp.company_name }}</span></td>
-                <td class="date">{{ exp.start_date }} — {% if exp.is_current %}Теперішній час{% else %}{{ exp.end_date }}{% endif %}</td>
+                <td class="date">{{ exp.start_date }} — {% if exp.is_current %}{{ labels.present }}{% else %}{{ exp.end_date }}{% endif %}</td>
             </tr>
         </table>
         <p>{{ exp.description }}</p>
     </div>
     {% empty %}
-    <p>Досвід роботи відсутній.</p>
+    <p>{{ labels.no_experience }}</p>
     {% endfor %}
 
-    <h2 class="section-title">Проєкти (Pet Projects)</h2>
+    <h2 class="section-title">{{ labels.projects }}</h2>
     {% for project in resume.projects.all %}
     <div class="item">
         <table class="item-header">
@@ -171,7 +171,7 @@
                     {{ project.title }}
                     {% if project.link %}
                         <span style="font-size: 12px; font-weight: normal; margin-left: 10px;">
-                            <a href="{{ project.link }}" target="_blank" style="color: #2b6cb0; text-decoration: none;">🔗 Посилання</a>
+                            <a href="{{ project.link }}" target="_blank" style="color: #2b6cb0; text-decoration: none;">🔗 {{ labels.link }}</a>
                         </span>
                     {% endif %}
                 </td>
@@ -181,47 +181,47 @@
         <p>{{ project.description }}</p>
     </div>
     {% empty %}
-    <p>Проєкти відсутні.</p>
+    <p>{{ labels.no_projects }}</p>
     {% endfor %}
 
-    <h2 class="section-title">Освіта</h2>
+    <h2 class="section-title">{{ labels.education }}</h2>
     {% for edu in resume.education.all %}
     <div class="item">
         <table class="item-header">
             <tr>
                 <td class="item-title">{{ edu.degree }} <span class="item-subtitle">({{ edu.field_of_study }})</span></td>
-                <td class="date">Рік випуску: {{ edu.graduation_year }}</td>
+                <td class="date">{{ labels.graduation_year }}: {{ edu.graduation_year }}</td>
             </tr>
         </table>
         <p>{{ edu.institution }}</p>
     </div>
     {% empty %}
-    <p>Інформація про освіту відсутня.</p>
+    <p>{{ labels.no_education }}</p>
     {% endfor %}
 
     <table class="compact-table">
         <tr>
             <td class="compact-td" style="width: 45%; padding-right: 5%;">
-                <h2 class="section-title" style="margin-top: 10px;">Знання мов</h2>
+                <h2 class="section-title" style="margin-top: 10px;">{{ labels.languages }}</h2>
                 {% for lang in resume.languages.all %}
                     <div style="margin-bottom: 6px;">
                         <span style="font-weight: bold;">{{ lang.name }}</span> 
                         <span class="badge">{{ lang.get_level_display }}</span>
                     </div>
                 {% empty %}
-                    <p>Не вказано.</p>
+                    <p>{{ labels.no_languages }}</p>
                 {% endfor %}
             </td>
 
             <td class="compact-td" style="width: 50%;">
-                <h2 class="section-title" style="margin-top: 10px;">Сертифікати</h2>
+                <h2 class="section-title" style="margin-top: 10px;">{{ labels.certifications }}</h2>
                 {% for cert in resume.certifications.all %}
                     <div style="margin-bottom: 8px; page-break-inside: avoid;">
                         <span style="font-weight: bold;">{{ cert.name }}</span> — <span class="item-subtitle">{{ cert.issuing_organization }}</span>
                         {% if cert.issue_date %}<div class="date" style="text-align: left; display:block;">{{ cert.issue_date }} - {{ cert.url }}</div>{% endif %}
                     </div>
                 {% empty %}
-                    <p>Сертифікати відсутні.</p>
+                    <p>{{ labels.no_certifications }}</p>
                 {% endfor %}
             </td>
         </tr>

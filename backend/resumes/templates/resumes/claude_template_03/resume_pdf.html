@@ -33,7 +33,7 @@
             <div class="rail-divider"></div>
 
             <div class="rail-block">
-                <h2 class="rail-heading">Contact</h2>
+                <h2 class="rail-heading">{{ labels.contact }}</h2>
                 <ul class="rail-list">
                     {% if personal_info.email %}<li><i class="fa-solid fa-envelope"></i>{{ personal_info.email }}</li>{% endif %}
                     {% if personal_info.phone_number %}<li><i class="fa-solid fa-phone"></i>{{ personal_info.phone_number }}</li>{% endif %}
@@ -54,7 +54,7 @@
             {% if skills %}
             <div class="rail-divider"></div>
             <div class="rail-block">
-                <h2 class="rail-heading">Skills</h2>
+                <h2 class="rail-heading">{{ labels.skills }}</h2>
                 <div class="gauge-list">
                     {% for skill in skills %}
                     <div class="gauge">
@@ -75,7 +75,7 @@
             {% if languages %}
             <div class="rail-divider"></div>
             <div class="rail-block">
-                <h2 class="rail-heading">Languages</h2>
+                <h2 class="rail-heading">{{ labels.languages }}</h2>
                 <ul class="rail-list rail-list-plain">
                     {% for lang in languages %}
                     <li><span class="lang-name">{{ lang.name }}</span><span class="lang-dot"></span>{{ lang.level }}</li>
@@ -91,23 +91,23 @@
 
             {% if resume.summary %}
             <section class="section">
-                <h2 class="section-title"><span class="section-code">§00</span>Profile</h2>
+                <h2 class="section-title"><span class="section-code">§00</span>{{ labels.profile }}</h2>
                 <p class="summary-text">{{ resume.summary }}</p>
             </section>
             {% endif %}
 
             {% if experience %}
             <section class="section">
-                <h2 class="section-title"><span class="section-code">§01</span>Employment</h2>
+                <h2 class="section-title"><span class="section-code">§01</span>{{ labels.employment }}</h2>
                 <div class="scale">
                     <div class="scale-rule"></div>
                     {% for job in experience %}
                     <div class="scale-item">
                         <span class="scale-tick"></span>
-                        <div class="scale-date">{{ job.start_date|date:"M Y" }} &rarr; {{ job.end_date|date:"M Y"|default:"present" }}</div>
+                        <div class="scale-date">{{ job.start_date|date:"M Y" }} &rarr; {{ job.end_date|date:"M Y"|default:labels.present }}</div>
                         <div class="scale-body">
                             <div class="entry-row">
-                                <span class="entry-title">{{ job.title }}</span>
+                                <span class="entry-title">{{ job.position }}</span>
                             </div>
                             <div class="entry-subtitle">{{ job.company_name }}</div>
                             {% if job.description %}<p class="entry-desc">{{ job.description }}</p>{% endif %}
@@ -120,7 +120,7 @@
 
             {% if education %}
             <section class="section">
-                <h2 class="section-title"><span class="section-code">§02</span>Education</h2>
+                <h2 class="section-title"><span class="section-code">§02</span>{{ labels.education }}</h2>
                 <div class="scale">
                     <div class="scale-rule"></div>
                     {% for edu in education %}
@@ -141,7 +141,7 @@
 
             {% if projects %}
             <section class="section">
-                <h2 class="section-title"><span class="section-code">§03</span>Pet-projects</h2>
+                <h2 class="section-title"><span class="section-code">§03</span>{{ labels.projects }}</h2>
                 <div class="blueprint-grid">
                     {% for project in projects %}
                     <div class="bp-card">
@@ -162,7 +162,7 @@
 
             {% if certifications %}
             <section class="section">
-                <h2 class="section-title"><span class="section-code">§04</span>Certifications</h2>
+                <h2 class="section-title"><span class="section-code">§04</span>{{ labels.certifications }}</h2>
                 <ul class="cert-list">
                     {% for cert in certifications %}
                     <li class="cert-item">
