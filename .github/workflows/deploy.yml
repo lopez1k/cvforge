@@ -14,7 +14,9 @@ jobs:
       - name: Sync Files
         run: |
           cd /var/www/cvforge-source/
-          git pull origin main
+          git fetch origin main
+          git reset --hard origin/main
+          git clean -fd
       
          
 
