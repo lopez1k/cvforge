@@ -2,3 +2,4 @@ backend/.env
 *.pyc
 backend/venv
 backend/data.json
+*.Identifier

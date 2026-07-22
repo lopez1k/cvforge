@@ -52,21 +52,21 @@
 
         {% if resume.summary %}
         <section class="card">
-            <div class="card-tab">No. 01 &middot; Profile</div>
+            <div class="card-tab">No. 01 &middot; {{ labels.profile }}</div>
             <p class="summary-text">{{ resume.summary }}</p>
         </section>
         {% endif %}
 
         {% if experience %}
         <section class="card">
-            <div class="card-tab">No. 02 &middot; Employment</div>
+            <div class="card-tab">No. 02 &middot; {{ labels.employment }}</div>
             {% for job in experience %}
             <div class="record">
-                <div class="record-stub">{{ job.start_date|date:"Y" }}&ndash;{{ job.end_date|date:"Y"|default:"now" }}</div>
+                <div class="record-stub">{{ job.start_date|date:"Y" }}&ndash;{{ job.end_date|date:"Y"|default:labels.present }}</div>
                 <div class="record-body">
                     <div class="entry-row">
-                        <span class="entry-title">{{ job.title }}</span>
-                        <span class="entry-date">{{ job.start_date|date:"M Y" }} &ndash; {{ job.end_date|date:"M Y"|default:"present" }}</span>
+                        <span class="entry-title">{{ job.position }}</span>
+                        <span class="entry-date">{{ job.start_date|date:"M Y" }} &ndash; {{ job.end_date|date:"M Y"|default:labels.present }}</span>
                     </div>
                     <div class="entry-subtitle">{{ job.company_name }}</div>
                     {% if job.description %}<p class="entry-desc">{{ job.description }}</p>{% endif %}
@@ -78,7 +78,7 @@
 
         {% if education %}
         <section class="card">
-            <div class="card-tab">No. 03 &middot; Education</div>
+            <div class="card-tab">No. 03 &middot; {{ labels.education }}</div>
             {% for edu in education %}
             <div class="record">
                 <div class="record-stub">{{ edu.start_year }}&ndash;{{ edu.graduation_year }}</div>
@@ -95,7 +95,7 @@
 
         {% if projects %}
         <section class="card">
-            <div class="card-tab">No. 04 &middot; Pet-projects</div>
+            <div class="card-tab">No. 04 &middot; {{ labels.projects }}</div>
             <div class="project-shelf">
                 {% for project in projects %}
                 <div class="project-slip">
@@ -115,7 +115,7 @@
 
         {% if certifications %}
         <section class="card">
-            <div class="card-tab">No. 05 &middot; Certifications</div>
+            <div class="card-tab">No. 05 &middot; {{ labels.certifications }}</div>
             <ul class="cert-list">
                 {% for cert in certifications %}
                 <li class="cert-item">
@@ -131,7 +131,7 @@
         <div class="card-pair">
             {% if skills %}
             <section class="card card-half">
-                <div class="card-tab">No. 06 &middot; Skills</div>
+                <div class="card-tab">No. 06 &middot; {{ labels.skills }}</div>
                 <div class="chip-list">
                     {% for skill in skills %}
                     <div class="skill-chip">
@@ -145,7 +145,7 @@
 
             {% if languages %}
             <section class="card card-half">
-                <div class="card-tab">No. 07 &middot; Languages</div>
+                <div class="card-tab">No. 07 &middot; {{ labels.languages }}</div>
                 <div class="chip-list">
                     {% for lang in languages %}
                     <span class="lang-chip"><strong>{{ lang.name }}</strong> &middot; {{ lang.level }}</span>

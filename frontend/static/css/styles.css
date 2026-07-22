@@ -352,6 +352,34 @@ textarea.input { resize: vertical; min-height: 5rem; }
 .photo-upload-actions { display: flex; flex-direction: column; align-items: flex-start; gap: .5rem; }
 .field-hint { font-size: .75rem; color: var(--text-dim); margin: 0; }
 
+.lang-switch {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: .4rem;
+}
+.lang-option {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: .85rem;
+  font-weight: 600;
+  padding: .5rem .9rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+.lang-option:hover { color: var(--text-primary); }
+.lang-option.is-active {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
 /* =========================================================
    Crop modal
    ========================================================= */

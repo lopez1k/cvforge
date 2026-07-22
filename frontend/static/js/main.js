@@ -141,6 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initPhotoUpload();
   initPipeline();
+  initLangSwitch();
   updateFooter();
 
   if (editingResumeId) {
@@ -643,12 +644,34 @@ function dataUrlToBlob(dataUrl) {
 }
 
 /* ============================================================
+   Resume language switch (EN / UA) — controls the labels used in
+   the exported PDF template, e.g. "Experience" vs "Досвід роботи".
+   ============================================================ */
+function initLangSwitch() {
+  const switchEl = document.getElementById('resumeLangSwitch');
+  if (!switchEl) return;
+  switchEl.querySelectorAll('.lang-option').forEach(btn => {
+    btn.addEventListener('click', () => setResumeLanguage(btn.dataset.lang));
+  });
+}
+
+function setResumeLanguage(lang) {
+  document.getElementById('resumeLanguage').value = lang;
+  document.querySelectorAll('#resumeLangSwitch .lang-option').forEach(btn => {
+    const isActive = btn.dataset.lang === lang;
+    btn.classList.toggle('is-active', isActive);
+    btn.setAttribute('aria-checked', String(isActive));
+  });
+}
+
+/* ============================================================
    Data collection (shared by review + save)
    ============================================================ */
 function collectResumeData() {
   const resumeData = {
     title: document.getElementById('title').value,
     summary: document.getElementById('summary').value,
+    language: document.getElementById('resumeLanguage').value || 'UA',
     personal_info: {}, links: [], experience: [], projects: [], education: [], languages: [], skills: [], certifications: [],
   };
 
@@ -748,6 +771,7 @@ function renderReview() {
 
   host.innerHTML = [
     card(1, 'Основне', `
+      <p class="review-row"><span>Мова резюме:</span> ${data.language === 'EN' ? '🇬🇧 English' : '🇺🇦 Українська'}</p>
       <p class="review-row"><span>Посада:</span> ${escapeHtml(data.title) || '—'}</p>
       <p class="review-row"><span>Про себе:</span> ${escapeHtml(data.summary) || '—'}</p>
     `),
@@ -811,6 +835,7 @@ async function loadResumeForEdit(id) {
   personalInfoId = data.personal_info.id || null;
   document.getElementById('title').value = data.title || '';
   document.getElementById('summary').value = data.summary || '';
+  setResumeLanguage(data.language || 'UA');
 
   document.getElementById('firstName').value = data.personal_info.first_name || '';
   document.getElementById('lastName').value = data.personal_info.last_name || '';
@@ -912,6 +937,7 @@ function buildResumeFormData(data) {
   const fd = new FormData();
   fd.append('title', data.title || '');
   fd.append('summary', data.summary || '');
+  fd.append('language', data.language || 'UA');
 
   const personalInfo = {
     id: data.personal_info.id || null,

@@ -6,6 +6,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+from django.utils import translation
 from .models import Resume
 from .serializers import ResumeSerializer, RegisterSerializer
 import os
@@ -13,6 +14,67 @@ from cvforge_project import settings
 from weasyprint import HTML, CSS
 from django.views.decorators.http import require_GET
 import json
+
+
+# Django locale code used to translate built-in template constructs
+# (e.g. the {{ ... |date:"M Y" }} month names) for each resume language.
+LOCALE_BY_LANGUAGE = {
+    'EN': 'en',
+    'UA': 'uk',
+}
+
+# Labels used inside the resume_pdf.html templates. Every template pulls
+# its section headings and static strings from here via {{ labels.xxx }},
+# switched based on resume.language ('EN' or 'UA').
+TEMPLATE_LABELS = {
+    'EN': {
+        'profile': 'Profile',
+        'employment': 'Employment',
+        'education': 'Education',
+        'projects': 'Pet-projects',
+        'certifications': 'Certifications',
+        'skills': 'Skills',
+        'languages': 'Languages',
+        'contact': 'Contact',
+        'contacts': 'Contacts',
+        'links': 'Links',
+        'personal_details': 'Personal details',
+        'present': 'Present',
+        'graduation_year': 'Graduation year',
+        'link': 'Link',
+        'no_experience': 'No work experience added.',
+        'no_projects': 'No projects added.',
+        'no_education': 'No education added.',
+        'no_languages': 'Not specified.',
+        'no_certifications': 'No certifications added.',
+    },
+    'UA': {
+        'profile': 'Про мене',
+        'employment': 'Досвід роботи',
+        'education': 'Освіта',
+        'projects': 'Проєкти (Pet Projects)',
+        'certifications': 'Сертифікати',
+        'skills': 'Навички',
+        'languages': 'Мови',
+        'contact': 'Контакти',
+        'contacts': 'Контакти',
+        'links': 'Посилання',
+        'personal_details': 'Особисті дані',
+        'present': 'дотепер',
+        'graduation_year': 'Рік випуску',
+        'link': 'Посилання',
+        'no_experience': 'Досвід роботи відсутній.',
+        'no_projects': 'Проєкти відсутні.',
+        'no_education': 'Інформація про освіту відсутня.',
+        'no_languages': 'Не вказано.',
+        'no_certifications': 'Сертифікати відсутні.',
+    },
+}
+
+
+def get_labels(resume):
+    """Return the label dict for a resume, falling back to English."""
+    return TEMPLATE_LABELS.get(resume.language, TEMPLATE_LABELS['EN'])
 
 
 def _parse_multipart_resume_data(request):
@@ -112,12 +174,13 @@ def resume_export_pdf(request, id):
         'skills': resume.skills.all,
         'skill_levels': skill_levels,
         'projects': resume.projects.all,
-        'certifications': resume.certifications.all
+        'certifications': resume.certifications.all,
+        'labels': get_labels(resume),
     }
-    
-    
-    html_string = render_to_string(f'resumes/{template}/resume_pdf.html', context)
-    
+
+    with translation.override(LOCALE_BY_LANGUAGE.get(resume.language, 'en')):
+        html_string = render_to_string(f'resumes/{template}/resume_pdf.html', context)
+
     pdf_bytes = HTML(
         string=html_string, 
         base_url=request.build_absolute_uri()
@@ -153,17 +216,19 @@ def public_resume(request, slug):
         'Expert': 5,
     }
     print(resume)
-    html_content = render_to_string(f'resumes/{template}/resume_pdf.html', context = {
-        'css_path': f'/static/templates/resumes/{template}/static/css/styles.css', 
-        'resume': resume, 
-        'personal_info' : resume.personal_info,
-        'experience': resume.experience.all,
-        'education': resume.education.all,
-        'languages': resume.languages.all,
-        'links': resume.links.all,
-        'skills': resume.skills.all,
-        'skill_levels': skill_levels,
-        'projects': resume.projects.all,
-        'certifications': resume.certifications.all
-    })
+    with translation.override(LOCALE_BY_LANGUAGE.get(resume.language, 'en')):
+        html_content = render_to_string(f'resumes/{template}/resume_pdf.html', context = {
+            'css_path': f'/static/templates/resumes/{template}/static/css/styles.css', 
+            'resume': resume, 
+            'personal_info' : resume.personal_info,
+            'experience': resume.experience.all,
+            'education': resume.education.all,
+            'languages': resume.languages.all,
+            'links': resume.links.all,
+            'skills': resume.skills.all,
+            'skill_levels': skill_levels,
+            'projects': resume.projects.all,
+            'certifications': resume.certifications.all,
+            'labels': get_labels(resume),
+        })
     return HttpResponse(html_content)

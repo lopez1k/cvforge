@@ -10,6 +10,7 @@ class Resume(models.Model):
     summary = models.TextField(verbose_name = "Опис", max_length = 500, null = True, blank = True)
     slug = models.UUIDField(default=uuid.uuid4, editable = False, unique = True)
     is_public = models.BooleanField(default = False)
+    language = models.CharField(verbose_name = "Мова шаблону", max_length = 4, default = "UA")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
